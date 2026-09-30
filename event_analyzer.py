@@ -7,7 +7,7 @@ def extract_themes(event_description: str, interests: str) -> list:
     """
     Extracts high-level topics/themes derived strictly from the user's event description and interests.
     Uses Gemini API if available, or dynamic NLP keyword/phrase extraction from the input text.
-    Does NOT return hardcoded default topics if inputs are missing or invalid.
+    Does NOT return hardcoded default topics or garbage stop words.
     """
     event_desc = event_description.strip()
     user_int = interests.strip()
@@ -43,15 +43,13 @@ def extract_themes(event_description: str, interests: str) -> list:
             pass
 
     # Dynamic NLP Keyword / Keyphrase Extraction from user's actual text
-    combined_text = f"{event_desc} {user_int}"
+    extracted_topics = []
     
     # 1. Extract interest terms explicitly listed by user
-    extracted_topics = []
     if user_int:
         for item in re.split(r'[,;.]', user_int):
             clean_item = item.strip()
             if len(clean_item) > 1 and clean_item.lower() not in [t.lower() for t in extracted_topics]:
-                # Preserve proper casing (e.g. AI, ML, LLM)
                 if clean_item.lower() == "ai":
                     extracted_topics.append("AI")
                 elif clean_item.lower() == "ml":
@@ -59,23 +57,24 @@ def extract_themes(event_description: str, interests: str) -> list:
                 else:
                     extracted_topics.append(clean_item.title())
 
-    # 2. Extract multi-word tech / business keyphrases from event description
+    # Stop words and generic noise words to filter out
     stop_words = {
         "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", 
         "by", "from", "up", "about", "into", "over", "after", "is", "are", "was", "were", 
         "be", "been", "being", "have", "has", "had", "do", "does", "did", "will", "would", 
         "should", "can", "could", "may", "might", "must", "this", "that", "these", "those", 
-        "your", "their", "our", "its", "event", "session", "conference", "meetup", "summit"
+        "your", "their", "our", "its", "event", "session", "conference", "meetup", "summit",
+        "any", "some", "other", "also", "main", "many", "all", "observable", "which", "what",
+        "how", "why", "who", "where", "when", "there", "here", "just", "more", "most"
     }
 
     words = re.findall(r'\b[A-Za-z0-9\-]+\b', event_desc)
     
-    # Find prominent capitalized or technical terms in event description
     for w in words:
         if len(extracted_topics) >= 4:
             break
         w_clean = w.strip()
-        if len(w_clean) > 2 and w_clean.lower() not in stop_words:
+        if len(w_clean) > 3 and w_clean.lower() not in stop_words:
             formatted = w_clean.upper() if w_clean.lower() in ["ai", "ml", "llm", "api", "nlp"] else w_clean.capitalize()
             if formatted.lower() not in [t.lower() for t in extracted_topics]:
                 extracted_topics.append(formatted)

@@ -40,6 +40,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'profile', label: 'User Profile', icon: User },
   ];
 
+  const isAuthenticated = profile.name && profile.name !== "Guest User" && profile.name.trim() !== "";
+
   return (
     <aside className="sidebar">
       <div className="brand-title">
@@ -48,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
         <div>
           <div className="brand-text-name">AI Networking</div>
-          <div className="brand-text-tag">COMPANION v2.1</div>
+          <div className="brand-text-tag">COMPANION v2.2</div>
         </div>
       </div>
 
@@ -70,37 +72,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div className="sidebar-user" onClick={() => setActiveTab('profile')} style={{ cursor: 'pointer' }}>
-          <div className="user-avatar">
-            {profile.name ? profile.name.charAt(0) : 'C'}
+        <div className="sidebar-user" onClick={() => isAuthenticated ? setActiveTab('profile') : onOpenAuth()} style={{ cursor: 'pointer' }}>
+          <div className="user-avatar" style={{ background: isAuthenticated ? '#2563eb' : '#64748b' }}>
+            {isAuthenticated ? profile.name.charAt(0) : 'G'}
           </div>
           <div style={{ flex: 1, overflow: 'hidden' }}>
             <div className="user-name" style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-              {profile.name || 'Challa Madhav'}
+              {isAuthenticated ? profile.name : 'Guest User'}
             </div>
-            <div className="user-status" style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-              {profile.status || 'AI Engineer'}
+            <div className="user-status" style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', color: isAuthenticated ? '#94a3b8' : '#cbd5e1' }}>
+              {isAuthenticated ? (profile.status || 'Active Member') : 'Not Signed In'}
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '6px' }}>
-          <button
-            className="btn btn-secondary"
-            onClick={onOpenAuth}
-            style={{ flex: 1, padding: '6px 10px', fontSize: '11px', background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)' }}
-          >
-            <LogIn size={12} /> Account
-          </button>
+        {isAuthenticated ? (
           <button
             className="btn btn-secondary"
             onClick={onLogout}
-            style={{ padding: '6px 10px', fontSize: '11px', background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)' }}
-            title="Log Out"
+            style={{ width: '100%', padding: '8px', fontSize: '12px', gap: '6px' }}
           >
-            <LogOut size={12} />
+            <LogOut size={14} /> Sign Out
           </button>
-        </div>
+        ) : (
+          <button
+            className="btn btn-primary"
+            onClick={onOpenAuth}
+            style={{ width: '100%', padding: '8px', fontSize: '12px', gap: '6px' }}
+          >
+            <LogIn size={14} /> Sign In / Register
+          </button>
+        )}
       </div>
     </aside>
   );

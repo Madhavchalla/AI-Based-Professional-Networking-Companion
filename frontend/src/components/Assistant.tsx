@@ -25,9 +25,10 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [sessionData, setSessionData] = useState<any>(null);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
   const [wikiData, setWikiData] = useState<WikiReference | null>(null);
-  const [feedbackState, setFeedbackState] = useState<Record<number, 'like' | 'dislike'>>({});
+  const [feedbackState, setFeedbackState] = useState<Record<string, 'like' | 'dislike'>>({});
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({ 0: 0, 1: 0, 2: 0, 3: 0 });
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const goalOptions = [
@@ -51,6 +52,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
     setSavedSuccess(false);
     setWikiData(null);
     setSessionData(null);
+    setSelectedOptions({ 0: 0, 1: 0, 2: 0, 3: 0 });
     
     try {
       const res = await api.generateConversation({
@@ -75,14 +77,14 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
     }
   };
 
-  const handleFeedback = (stepIdx: number, text: string, action: 'like' | 'dislike') => {
-    setFeedbackState((prev) => ({ ...prev, [stepIdx]: action }));
+  const handleFeedback = (key: string, text: string, action: 'like' | 'dislike') => {
+    setFeedbackState((prev) => ({ ...prev, [key]: action }));
     api.logFeedback(text, action, selectedGoal);
   };
 
-  const handleCopy = (text: string, idx: number) => {
+  const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
-    setCopiedIndex(idx);
+    setCopiedIndex(key);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
@@ -102,11 +104,11 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
   return (
     <div>
       <div className="header-banner">
-        <span className="header-category">STEP-BY-STEP CONVERSATION GENERATOR</span>
+        <span className="header-category">MULTI-OPTION CONVERSATION SEQUENCER</span>
         <h1 className="header-title">🤝 Networking Assistant</h1>
         <p className="header-subtitle">
-          Input an event description and your specific interests to extract key themes using DistilBERT 
-          and generate a custom multi-step conversation flow.
+          Input your event description and specific interests to extract key themes and generate 
+          multiple alternative conversation options for every phase of your networking interaction.
         </p>
       </div>
 
@@ -149,7 +151,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Event Description (Required for DistilBERT Theme Extraction)</label>
+          <label className="form-label">Event Description (Required for Theme Extraction)</label>
           <textarea
             className="textarea-field"
             value={eventDesc}
@@ -172,7 +174,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
         </div>
 
         <button className="btn btn-primary" onClick={handleGenerate} disabled={loading} style={{ width: '100%' }}>
-          {loading ? 'Analyzing Event & Generating Flows...' : '✨ Analyze Event & Generate Multi-Step Flow'}
+          {loading ? 'Analyzing Event & Generating Options...' : '✨ Analyze Event & Generate Multi-Option Sequence'}
         </button>
       </div>
 
@@ -182,7 +184,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <h4 style={{ color: '#16a34a', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  🧠 DistilBERT Extracted Event Themes:
+                  🧠 Extracted Event Themes:
                 </h4>
                 <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                   {sessionData.topics.map((t: string, i: number) => (
@@ -219,41 +221,73 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
 
           <div className="card">
             <h3 className="card-title">
-              <Sparkles size={18} color="#2563eb" /> 2. Multi-Step Natural Conversation Sequence
+              <Sparkles size={18} color="#2563eb" /> 2. Multi-Option Conversation Sequence (Select Your Style)
             </h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '20px' }}>
-              A natural sequence designed around your selected goal: <strong style={{ color: 'var(--text-main)' }}>{selectedGoal}</strong>
+              Multiple questions generated for each phase based on your goal: <strong style={{ color: 'var(--text-main)' }}>{selectedGoal}</strong>
             </p>
 
             <div className="timeline-flow">
-              {sessionData.multi_step_flow.map((item: any, idx: number) => (
-                <div key={idx} className="timeline-step">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className="step-num">STEP {item.step} • {item.stage}</span>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button
-                        className="btn-icon-only"
-                        onClick={() => handleFeedback(idx, item.question, 'like')}
-                        style={{ color: feedbackState[idx] === 'like' ? '#16a34a' : 'var(--text-muted)' }}
-                      >
-                        <ThumbsUp size={14} />
-                      </button>
-                      <button
-                        className="btn-icon-only"
-                        onClick={() => handleFeedback(idx, item.question, 'dislike')}
-                        style={{ color: feedbackState[idx] === 'dislike' ? '#dc2626' : 'var(--text-muted)' }}
-                      >
-                        <ThumbsDown size={14} />
-                      </button>
-                      <button className="btn-icon-only" onClick={() => handleCopy(item.question, idx)}>
-                        {copiedIndex === idx ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
-                      </button>
+              {sessionData.multi_step_flow.map((stepItem: any, stepIdx: number) => {
+                const optionsList = stepItem.options || [stepItem.question];
+                const activeOptIdx = selectedOptions[stepIdx] || 0;
+                const activeQuestion = optionsList[activeOptIdx] || stepItem.question;
+                const feedbackKey = `${stepIdx}_${activeOptIdx}`;
+
+                return (
+                  <div key={stepIdx} className="timeline-step">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span className="step-num">{stepItem.stage}</span>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        <button
+                          className="btn-icon-only"
+                          onClick={() => handleFeedback(feedbackKey, activeQuestion, 'like')}
+                          style={{ color: feedbackState[feedbackKey] === 'like' ? '#16a34a' : 'var(--text-muted)' }}
+                        >
+                          <ThumbsUp size={14} />
+                        </button>
+                        <button
+                          className="btn-icon-only"
+                          onClick={() => handleFeedback(feedbackKey, activeQuestion, 'dislike')}
+                          style={{ color: feedbackState[feedbackKey] === 'dislike' ? '#dc2626' : 'var(--text-muted)' }}
+                        >
+                          <ThumbsDown size={14} />
+                        </button>
+                        <button className="btn-icon-only" onClick={() => handleCopy(activeQuestion, feedbackKey)}>
+                          {copiedIndex === feedbackKey ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
+                        </button>
+                      </div>
                     </div>
+
+                    {/* Option Selection Tabs */}
+                    {optionsList.length > 1 && (
+                      <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                        {optionsList.map((_: any, optIdx: number) => (
+                          <button
+                            key={optIdx}
+                            onClick={() => setSelectedOptions((prev) => ({ ...prev, [stepIdx]: optIdx }))}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              border: activeOptIdx === optIdx ? '1px solid #2563eb' : '1px solid #cbd5e1',
+                              background: activeOptIdx === optIdx ? '#e0f2fe' : '#ffffff',
+                              color: activeOptIdx === optIdx ? '#0284c7' : 'var(--text-muted)'
+                            }}
+                          >
+                            Option {optIdx + 1}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="step-question">"{activeQuestion}"</div>
+                    <div className="step-explain">💡 <strong>Why this works:</strong> {stepItem.explanation}</div>
                   </div>
-                  <div className="step-question">"{item.question}"</div>
-                  <div className="step-explain">💡 <strong>Why this works:</strong> {item.explanation}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

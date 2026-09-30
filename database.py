@@ -5,11 +5,10 @@ from datetime import datetime
 
 DB_FILE = "db.json"
 
-# Clean, real initial database without dummy accounts or fake metrics
 DEFAULT_DB = {
     "users": [],
     "profile": {
-        "name": "",
+        "name": "Guest User",
         "email": "",
         "status": "Not Signed In",
         "skills": [],
@@ -177,7 +176,6 @@ def log_feedback_item(starter_text, action, category="general"):
     save_db(db)
     return {"feedback": new_entry, "preferences": prefs}
 
-# Real, accurate analytics calculation
 def get_analytics():
     db = load_db()
     sessions = db.get("sessions", [])

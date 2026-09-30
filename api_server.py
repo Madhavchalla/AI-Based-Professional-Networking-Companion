@@ -15,7 +15,7 @@ import database
 app = FastAPI(
     title="AI-Based Professional Networking Companion API",
     description="Backend API powering AI theme extraction, multi-step conversation flows, person matching, Wikipedia fact references, follow-up generators, and user authentication.",
-    version="2.2.0"
+    version="2.3.0"
 )
 
 # Enable CORS for React frontend
@@ -86,10 +86,9 @@ class SessionSaveRequest(BaseModel):
     notes: Optional[str] = ""
 
 def format_list_human(items: List[str]) -> str:
-    """Helper to format list into clean English phrase (e.g. 'AI, healthcare, and Ethics')"""
-    clean_items = [i.strip() for i in items if i and i.strip()]
+    clean_items = [i.strip() for i in items if i and i.strip() and i.lower() not in ["any", "observable", "some", "other"]]
     if not clean_items:
-        return "these topics"
+        return "these key topics"
     if len(clean_items) == 1:
         return clean_items[0]
     if len(clean_items) == 2:
@@ -159,14 +158,13 @@ def analyze_event(req: EventAnalyzeRequest):
         "topics": topics
     }
 
-# Multi-Step Conversation Generator
+# Multi-Step Conversation Generator (Multi-Option per Phase)
 @app.post("/api/generate-conversation")
 def generate_conversation_flow(req: MultiStepConversationRequest):
     event_desc = req.event_description.strip()
     user_interests = req.interests.strip()
     goal = req.networking_goal.strip() or "Build professional connections"
     
-    # Strict Input Validation - Require user input!
     if not event_desc:
         raise HTTPException(status_code=400, detail="Event description is required to generate conversation starters.")
     if not user_interests:
@@ -178,53 +176,85 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
         
     themes_str = format_list_human(themes)
     primary_interest = user_interests.split(',')[0].strip() if user_interests else themes[0]
+    first_theme = themes[0] if themes else "this topic"
     
-    # Dynamic Multi-Step Sequence Construction
-    opening = f"Hi! What brings you to this event focusing on {themes[0]}?"
+    # Phase 1: Opening Icebreakers (3 Options)
+    openers = [
+        f"Hi! What brings you to this session on {first_theme}?",
+        f"Hello! Have you been following the recent developments in {themes_str}?",
+        f"Hi there! What has been the most interesting talk or topic for you at this event so far?"
+    ]
     
+    # Phase 2: Goal-Aligned Follow-Ups (3 Options)
     if "mentor" in goal.lower():
-        follow_up = f"I'm really interested in building expertise in {primary_interest}. How did you navigate your career path in this domain?"
-        deeper = f"Looking back at your work in {themes_str}, what's one key decision or lesson that shaped your current approach?"
-        closing = f"I've learned so much from your perspective! Would you be open to connecting on LinkedIn or grabbing a brief virtual coffee sometime?"
+        follow_ups = [
+            f"I'm really interested in building expertise in {primary_interest}. How did you navigate your career path in this domain?",
+            f"As someone working around {themes_str}, what advice would you give to someone looking to grow in this area?",
+            f"What were some pivotal experiences or projects that helped you master {primary_interest}?"
+        ]
     elif "internship" in goal.lower() or "career" in goal.lower():
-        follow_up = f"My background is in {primary_interest}, and I'm looking to apply my skills. How are teams in your organization tackling {themes[0]} right now?"
-        deeper = f"What key skills or experience do you value most when bringing new team members into {themes_str} projects?"
-        closing = f"This was super insightful! May I share my resume or connect with you on LinkedIn to stay updated on future opportunities?"
+        follow_ups = [
+            f"My background is in {primary_interest}, and I'm actively exploring new opportunities. How are teams in your organization tackling {first_theme} right now?",
+            f"What key technical skills or project experience do you value most when hiring for {primary_interest} roles?",
+            f"How is your team expanding its efforts in {themes_str}, and what kind of projects are you focusing on?"
+        ]
     elif "research" in goal.lower():
-        follow_up = f"I notice your focus touches on {themes_str}. What current research questions or methodologies are you most excited about right now?"
-        deeper = f"How do you address open challenges like data quality or ethics when working on {primary_interest}?"
-        closing = f"I'd love to follow your research work! Could I add you on LinkedIn or exchange contact details?"
+        follow_ups = [
+            f"I notice your work touches on {themes_str}. What current research questions or methodologies are you most excited about right now?",
+            f"What open research challenges in {primary_interest} do you feel are currently under-explored?",
+            f"How are you approaching experimental validation or data collection in your {first_theme} projects?"
+        ]
     else:
-        follow_up = f"What specific aspect of {themes[0]} aligns most with your current focus?"
-        deeper = f"How do you see trends in {primary_interest} evolving over the next couple of years?"
-        closing = f"It was fantastic exchanging ideas with you! Let's definitely stay connected on LinkedIn."
+        follow_ups = [
+            f"What specific aspect of {first_theme} aligns most with your current projects?",
+            f"How is your organization approaching current industry trends in {themes_str}?",
+            f"What has been your main focus or initiative recently regarding {primary_interest}?"
+        ]
+
+    # Phase 3: Deeper Technical / Industry Questions (3 Options)
+    deeper_questions = [
+        f"Looking back at recent advancements in {themes_str}, what's one key decision or architecture lesson that shaped your current approach?",
+        f"How do you address open challenges like data quality, security, or ethics when working on {primary_interest}?",
+        f"Where do you see the biggest technical bottlenecks or breakthroughs happening in {first_theme} over the next couple of years?"
+    ]
+
+    # Phase 4: Connection & Closing Questions (3 Options)
+    closings = [
+        f"I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+        f"This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+        f"I'd love to stay updated on your work with {primary_interest}. May I follow up with you on LinkedIn?"
+    ]
 
     gpt2_starters = generate_conversation_starters(event_desc, user_interests, themes)
 
     multi_step_flow = [
         {
             "step": 1,
-            "stage": "Opening Icebreaker",
-            "question": opening,
-            "explanation": "Gentle, low-pressure question to break the ice naturally."
+            "stage": "Step 1 • Opening Icebreaker",
+            "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+            "options": openers,
+            "question": openers[0]
         },
         {
             "step": 2,
-            "stage": "Follow-Up Question",
-            "question": follow_up,
-            "explanation": f"Explores current work while aligning with your goal: '{goal}'."
+            "stage": "Step 2 • Follow-Up Question",
+            "explanation": f"Explores current work while aligning with your goal: '{goal}'.",
+            "options": follow_ups,
+            "question": follow_ups[0]
         },
         {
             "step": 3,
-            "stage": "Deeper Technical / Industry Focus",
-            "question": deeper,
-            "explanation": f"Drives a meaningful conversation around {themes_str}."
+            "stage": "Step 3 • Deeper Technical / Industry Focus",
+            "explanation": f"Drives a meaningful conversation around {themes_str}.",
+            "options": deeper_questions,
+            "question": deeper_questions[0]
         },
         {
             "step": 4,
-            "stage": "Connection & Closing Question",
-            "question": closing,
-            "explanation": "Seamless transition to secure contact info and build a lasting professional link."
+            "stage": "Step 4 • Connection & Closing Question",
+            "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+            "options": closings,
+            "question": closings[0]
         }
     ]
 
@@ -309,12 +339,15 @@ def generate_followup(req: FollowUpRequest):
     first_name = name.split()[0]
     subject = f"Great meeting you at {event}!"
     
+    profile_name = database.get_profile().get('name')
+    sender = profile_name if (profile_name and profile_name != "Guest User") else "Professional Networker"
+    
     body = (
         f"Hi {first_name},\n\n"
         f"It was a pleasure meeting you at {event}. I really enjoyed our conversation regarding \"{notes}\".\n\n"
         f"I'd love to stay in touch and follow your work. Let me know if you'd ever be open to catching up for a brief virtual coffee!\n\n"
         f"Best regards,\n"
-        f"{database.get_profile().get('name') or 'Professional Networker'}"
+        f"{sender}"
     )
     
     return {
