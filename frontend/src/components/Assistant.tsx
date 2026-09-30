@@ -7,7 +7,8 @@ import {
   Copy, 
   Check, 
   Save, 
-  Layers
+  Layers,
+  AlertCircle
 } from 'lucide-react';
 import type { UserProfile, WikiReference } from '../types';
 import { api } from '../api';
@@ -17,13 +18,12 @@ interface AssistantProps {
 }
 
 export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
-  const [eventName, setEventName] = useState('AI in Public Health & Clinical Safety Summit');
-  const [eventDesc, setEventDesc] = useState(
-    'Exploring Generative AI, machine learning applications, and patient safety data ethics in healthcare.'
-  );
-  const [interests, setInterests] = useState(profile.interests.join(', '));
+  const [eventName, setEventName] = useState('');
+  const [eventDesc, setEventDesc] = useState('');
+  const [interests, setInterests] = useState(profile.interests ? profile.interests.join(', ') : '');
   const [selectedGoal, setSelectedGoal] = useState('Find a mentor');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [sessionData, setSessionData] = useState<any>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [wikiData, setWikiData] = useState<WikiReference | null>(null);
@@ -41,10 +41,17 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
   ];
 
   const handleGenerate = async () => {
-    if (!eventDesc.trim()) return;
+    setErrorMsg('');
+    if (!eventDesc.trim() || !interests.trim()) {
+      setErrorMsg('⚠️ Please enter both an event description and your specific interests before generating conversation starters.');
+      return;
+    }
+
     setLoading(true);
     setSavedSuccess(false);
     setWikiData(null);
+    setSessionData(null);
+    
     try {
       const res = await api.generateConversation({
         event_description: eventDesc,
@@ -52,8 +59,8 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
         networking_goal: selectedGoal
       });
       setSessionData(res);
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      setErrorMsg(e.message || 'Failed to generate conversation starters. Please check your inputs.');
     } finally {
       setLoading(false);
     }
@@ -82,7 +89,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
   const handleSaveSession = async () => {
     if (!sessionData) return;
     await api.saveSession({
-      event_name: eventName,
+      event_name: eventName || 'Networking Event',
       event_description: eventDesc,
       interests: interests,
       goal: selectedGoal,
@@ -98,8 +105,8 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
         <span className="header-category">STEP-BY-STEP CONVERSATION GENERATOR</span>
         <h1 className="header-title">🤝 Networking Assistant</h1>
         <p className="header-subtitle">
-          Input an event, select your networking goal, extract key themes using DistilBERT, 
-          and generate a structured multi-step conversation sequence.
+          Input an event description and your specific interests to extract key themes using DistilBERT 
+          and generate a custom multi-step conversation flow.
         </p>
       </div>
 
@@ -108,6 +115,13 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
           <Layers size={18} color="#2563eb" /> 1. Event & Goals Configuration
         </h3>
 
+        {errorMsg && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '12px 16px', borderRadius: '6px', fontSize: '13px', marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertCircle size={16} />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           <div className="form-group">
             <label className="form-label">Event Name / Title</label>
@@ -115,7 +129,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
               type="text"
               className="input-field"
               value={eventName}
-              onChange={(e) => setEventName(e.target.value)}
+              onChange={(e) => { setEventName(e.target.value); setErrorMsg(''); }}
               placeholder="e.g. Annual AI & Healthcare Conference"
             />
           </div>
@@ -135,28 +149,30 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Event Description (Used for DistilBERT Theme Extraction)</label>
+          <label className="form-label">Event Description (Required for DistilBERT Theme Extraction)</label>
           <textarea
             className="textarea-field"
             value={eventDesc}
-            onChange={(e) => setEventDesc(e.target.value)}
-            placeholder="Paste event description or agenda summary..."
+            onChange={(e) => { setEventDesc(e.target.value); setErrorMsg(''); }}
+            placeholder="Paste event description, agenda, or speaker talk topics..."
+            required
           />
         </div>
 
         <div className="form-group">
-          <label className="form-label">Your Specific Interests (Comma-separated)</label>
+          <label className="form-label">Your Specific Interests (Required, comma-separated)</label>
           <input
             type="text"
             className="input-field"
             value={interests}
-            onChange={(e) => setInterests(e.target.value)}
+            onChange={(e) => { setInterests(e.target.value); setErrorMsg(''); }}
             placeholder="e.g. data ethics, patient safety, machine learning"
+            required
           />
         </div>
 
         <button className="btn btn-primary" onClick={handleGenerate} disabled={loading} style={{ width: '100%' }}>
-          {loading ? 'Analyzing with DistilBERT & Generating Flows...' : '✨ Analyze Event & Generate Multi-Step Flow'}
+          {loading ? 'Analyzing Event & Generating Flows...' : '✨ Analyze Event & Generate Multi-Step Flow'}
         </button>
       </div>
 

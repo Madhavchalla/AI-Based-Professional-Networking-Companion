@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, Sparkles, UserCheck } from 'lucide-react';
+import { UserPlus, Sparkles, UserCheck, AlertCircle } from 'lucide-react';
 import type { UserProfile, MatchedPerson } from '../types';
 import { api } from '../api';
 
@@ -15,27 +15,33 @@ export const PersonMatcher: React.FC<PersonMatcherProps> = ({ profile }) => {
   const [matchedResult, setMatchedResult] = useState<MatchedPerson | null>(null);
   const [savedPeople, setSavedPeople] = useState<MatchedPerson[]>([]);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     api.getPeople().then(setSavedPeople);
   }, []);
 
   const handleMatch = async () => {
-    if (!name || !title) return;
+    setErrorMsg('');
+    if (!name.trim() || !title.trim() || !personInterests.trim()) {
+      setErrorMsg("⚠️ Please enter the contact's name, title/organization, and known interests.");
+      return;
+    }
     setLoading(true);
+    setMatchedResult(null);
     try {
       const interestsArray = personInterests.split(',').map((i) => i.trim()).filter(Boolean);
       const res = await api.matchPerson({
-        name,
-        title,
-        person_interests: interestsArray.length ? interestsArray : ['Generative AI', 'Machine Learning'],
-        notes
+        name: name.trim(),
+        title: title.trim(),
+        person_interests: interestsArray,
+        notes: notes.trim()
       });
       setMatchedResult(res);
       const updated = await api.getPeople();
       setSavedPeople(updated);
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      setErrorMsg(e.message || 'Matching failed. Please check your inputs.');
     } finally {
       setLoading(false);
     }
@@ -58,36 +64,46 @@ export const PersonMatcher: React.FC<PersonMatcherProps> = ({ profile }) => {
             <UserPlus size={18} color="#2563eb" /> Target Contact Details
           </h3>
 
+          {errorMsg && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertCircle size={16} />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
           <div className="form-group">
-            <label className="form-label">Full Name</label>
+            <label className="form-label">Full Name (Required)</label>
             <input
               type="text"
               className="input-field"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setErrorMsg(''); }}
               placeholder="e.g. Dr. Rahul Sharma"
+              required
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Title / Role / Organization</label>
+            <label className="form-label">Title / Role / Organization (Required)</label>
             <input
               type="text"
               className="input-field"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => { setTitle(e.target.value); setErrorMsg(''); }}
               placeholder="e.g. Senior AI Researcher at BioHealth AI"
+              required
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Known Interests / Topics (Comma-separated)</label>
+            <label className="form-label">Known Interests / Topics (Required, comma-separated)</label>
             <input
               type="text"
               className="input-field"
               value={personInterests}
-              onChange={(e) => setPersonInterests(e.target.value)}
+              onChange={(e) => { setPersonInterests(e.target.value); setErrorMsg(''); }}
               placeholder="e.g. Generative AI, Patient Safety, Healthcare AI"
+              required
             />
           </div>
 
@@ -157,8 +173,7 @@ export const PersonMatcher: React.FC<PersonMatcherProps> = ({ profile }) => {
               <Sparkles size={36} color="#2563eb" style={{ opacity: 0.6, marginBottom: '12px' }} />
               <h4>Enter details on the left</h4>
               <p style={{ fontSize: '13px', marginTop: '6px' }}>
-                The AI engine will cross-reference your interests ({profile.interests.join(', ')}) to compute 
-                customized connection strategies.
+                The AI engine will cross-reference your interests {profile.interests && profile.interests.length > 0 ? `(${profile.interests.join(', ')})` : ''} to compute customized connection strategies.
               </p>
             </div>
           )}

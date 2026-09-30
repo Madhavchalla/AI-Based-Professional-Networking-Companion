@@ -15,7 +15,7 @@ import database
 app = FastAPI(
     title="AI-Based Professional Networking Companion API",
     description="Backend API powering AI theme extraction, multi-step conversation flows, person matching, Wikipedia fact references, follow-up generators, and user authentication.",
-    version="2.1.0"
+    version="2.2.0"
 )
 
 # Enable CORS for React frontend
@@ -32,7 +32,7 @@ class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
-    status: Optional[str] = "AI Engineer & Researcher"
+    status: Optional[str] = "Professional"
 
 class LoginRequest(BaseModel):
     email: str
@@ -85,6 +85,17 @@ class SessionSaveRequest(BaseModel):
     starters: List[dict]
     notes: Optional[str] = ""
 
+def format_list_human(items: List[str]) -> str:
+    """Helper to format list into clean English phrase (e.g. 'AI, healthcare, and Ethics')"""
+    clean_items = [i.strip() for i in items if i and i.strip()]
+    if not clean_items:
+        return "these topics"
+    if len(clean_items) == 1:
+        return clean_items[0]
+    if len(clean_items) == 2:
+        return f"{clean_items[0]} and {clean_items[1]}"
+    return f"{', '.join(clean_items[:-1])}, and {clean_items[-1]}"
+
 # API Routes
 
 @app.get("/")
@@ -130,13 +141,21 @@ def update_profile(profile: ProfileModel):
 # Event Analysis Route
 @app.post("/api/analyze-event")
 def analyze_event(req: EventAnalyzeRequest):
-    if not req.event_description.strip():
-        raise HTTPException(status_code=400, detail="Event description is required.")
+    event_desc = req.event_description.strip()
+    interests = req.interests.strip()
     
-    topics = extract_themes(req.event_description, req.interests)
+    if not event_desc:
+        raise HTTPException(status_code=400, detail="Event description is required.")
+    if not interests:
+        raise HTTPException(status_code=400, detail="Your specific interests are required.")
+        
+    topics = extract_themes(event_desc, interests)
+    if not topics:
+        raise HTTPException(status_code=400, detail="Could not extract meaningful topics from the provided text. Please provide more detail.")
+        
     return {
-        "event_description": req.event_description,
-        "interests": req.interests,
+        "event_description": event_desc,
+        "interests": interests,
         "topics": topics
     }
 
@@ -147,28 +166,37 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
     user_interests = req.interests.strip()
     goal = req.networking_goal.strip() or "Build professional connections"
     
+    # Strict Input Validation - Require user input!
+    if not event_desc:
+        raise HTTPException(status_code=400, detail="Event description is required to generate conversation starters.")
+    if not user_interests:
+        raise HTTPException(status_code=400, detail="Please specify your interests before generating conversation starters.")
+    
     themes = req.themes or extract_themes(event_desc, user_interests)
-    themes_str = ", ".join(themes)
+    if not themes:
+        themes = [i.strip() for i in user_interests.split(",") if i.strip()]
+        
+    themes_str = format_list_human(themes)
+    primary_interest = user_interests.split(',')[0].strip() if user_interests else themes[0]
     
-    prefs = database.load_db().get("preferences", {})
-    
-    opening = f"Hi! What brings you to this session on {themes[0] if themes else 'the event topics'}?"
+    # Dynamic Multi-Step Sequence Construction
+    opening = f"Hi! What brings you to this event focusing on {themes[0]}?"
     
     if "mentor" in goal.lower():
-        follow_up = f"I'm really interested in building expertise in {user_interests.split(',')[0] if user_interests else 'this space'}. How did you navigate your career path in this domain?"
-        deeper = f"Looking back at your recent projects in {themes_str}, what's one key decision or lesson that shaped your current approach?"
+        follow_up = f"I'm really interested in building expertise in {primary_interest}. How did you navigate your career path in this domain?"
+        deeper = f"Looking back at your work in {themes_str}, what's one key decision or lesson that shaped your current approach?"
         closing = f"I've learned so much from your perspective! Would you be open to connecting on LinkedIn or grabbing a brief virtual coffee sometime?"
     elif "internship" in goal.lower() or "career" in goal.lower():
-        follow_up = f"My background is in {user_interests.split(',')[0] if user_interests else 'tech'}, and I'm looking to apply my skills. How are teams in your organization tackling {themes[0]} right now?"
+        follow_up = f"My background is in {primary_interest}, and I'm looking to apply my skills. How are teams in your organization tackling {themes[0]} right now?"
         deeper = f"What key skills or experience do you value most when bringing new team members into {themes_str} projects?"
         closing = f"This was super insightful! May I share my resume or connect with you on LinkedIn to stay updated on future opportunities?"
     elif "research" in goal.lower():
-        follow_up = f"I notice you work around {themes_str}. What current research questions or methodologies are you most excited about right now?"
-        deeper = f"How do you address open challenges like data quality or ethics when working on {user_interests.split(',')[0]}?"
+        follow_up = f"I notice your focus touches on {themes_str}. What current research questions or methodologies are you most excited about right now?"
+        deeper = f"How do you address open challenges like data quality or ethics when working on {primary_interest}?"
         closing = f"I'd love to follow your research work! Could I add you on LinkedIn or exchange contact details?"
     else:
-        follow_up = f"What specific aspect of {themes[0] if themes else 'the event'} aligns most with your current focus?"
-        deeper = f"How do you see trends in {user_interests.split(',')[0] if user_interests else 'this area'} evolving over the next couple of years?"
+        follow_up = f"What specific aspect of {themes[0]} aligns most with your current focus?"
+        deeper = f"How do you see trends in {primary_interest} evolving over the next couple of years?"
         closing = f"It was fantastic exchanging ideas with you! Let's definitely stay connected on LinkedIn."
 
     gpt2_starters = generate_conversation_starters(event_desc, user_interests, themes)
@@ -190,7 +218,7 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
             "step": 3,
             "stage": "Deeper Technical / Industry Focus",
             "question": deeper,
-            "explanation": f"Drives a meaningful conversation around {themes_str} and {user_interests}."
+            "explanation": f"Drives a meaningful conversation around {themes_str}."
         },
         {
             "step": 4,
@@ -212,9 +240,15 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
 # Smart Person & Interest Matcher
 @app.post("/api/match-person")
 def match_person(req: PersonMatchRequest):
+    person_name = req.name.strip()
+    person_title = req.title.strip()
+    person_interests = [i.strip() for i in req.person_interests if i.strip()]
+    
+    if not person_name or not person_title:
+        raise HTTPException(status_code=400, detail="Person name and title/role are required for matching.")
+        
     user_profile = database.get_profile()
     user_interests = [i.lower().strip() for i in user_profile.get("interests", [])]
-    person_interests = [i.strip() for i in req.person_interests]
     
     common = []
     for pi in person_interests:
@@ -224,23 +258,23 @@ def match_person(req: PersonMatchRequest):
                     common.append(pi)
 
     overlap_count = len(common)
-    match_percentage = min(95, max(40, 50 + (overlap_count * 20)))
+    match_percentage = min(95, max(40, 50 + (overlap_count * 20))) if common else 50
     
     reason = (
-        f"You share strong alignment in {', '.join(common)}." if common 
-        else f"Complementary roles in {req.title} and {user_profile.get('status')} offering cross-disciplinary perspective."
+        f"You share strong alignment in {format_list_human(common)}." if common 
+        else f"Complementary background between {person_title} and your focus on {format_list_human(user_interests) if user_interests else 'tech'}."
     )
     
     opener = (
-        f"Hi {req.name.split()[0]}, I noticed your work in {common[0] if common else req.title}. "
-        f"I've been exploring {user_interests[0] if user_interests else 'this field'} as well—what project are you currently most focused on?"
+        f"Hi {person_name.split()[0]}, I noticed your work in {common[0] if common else person_title}. "
+        f"I've been exploring {user_interests[0] if user_interests else 'this area'} as well—what project are you currently most focused on?"
     )
     
     matched_person_obj = {
-        "name": req.name,
-        "title": req.title,
-        "interests": req.person_interests,
-        "common_interests": common if common else [req.person_interests[0]] if req.person_interests else ["Technology"],
+        "name": person_name,
+        "title": person_title,
+        "interests": person_interests,
+        "common_interests": common if common else person_interests,
         "match_percentage": match_percentage,
         "reason_to_connect": reason,
         "suggested_opener": opener,
@@ -254,7 +288,7 @@ def match_person(req: PersonMatchRequest):
 @app.get("/api/wiki-reference")
 def get_wiki_reference(query: str):
     if not query.strip():
-        raise HTTPException(status_code=400, detail="Query is required.")
+        raise HTTPException(status_code=400, detail="Search topic query is required.")
     summary = verify_fact(query)
     return {
         "query": query,
@@ -265,28 +299,22 @@ def get_wiki_reference(query: str):
 # Post-Conversation Follow-Up Assistant
 @app.post("/api/generate-followup")
 def generate_followup(req: FollowUpRequest):
-    name = req.person_name.strip() or "there"
-    event = req.event_name.strip() or "the event"
+    name = req.person_name.strip()
+    event = req.event_name.strip()
     notes = req.notes.strip()
+    
+    if not name or not event or not notes:
+        raise HTTPException(status_code=400, detail="Person name, event name, and conversation notes are required.")
     
     first_name = name.split()[0]
     subject = f"Great meeting you at {event}!"
     
     body = (
         f"Hi {first_name},\n\n"
-        f"It was a pleasure meeting you at {event}. I really enjoyed our conversation"
-    )
-    
-    if notes:
-        body += f", especially your insights on: \"{notes}\"."
-    else:
-        body += " and learning more about your work."
-        
-    body += (
-        f"\n\nI'd love to stay in touch and follow your work. "
-        f"Let me know if you'd ever be open to catching up for a brief virtual coffee!\n\n"
+        f"It was a pleasure meeting you at {event}. I really enjoyed our conversation regarding \"{notes}\".\n\n"
+        f"I'd love to stay in touch and follow your work. Let me know if you'd ever be open to catching up for a brief virtual coffee!\n\n"
         f"Best regards,\n"
-        f"{database.get_profile().get('name', 'Challa Madhav')}"
+        f"{database.get_profile().get('name') or 'Professional Networker'}"
     )
     
     return {
