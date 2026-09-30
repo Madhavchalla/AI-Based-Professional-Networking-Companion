@@ -16,28 +16,30 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
-    name: 'Challa Madhav',
-    status: 'AI Engineer & Researcher',
-    skills: ['Machine Learning', 'Python', 'React', 'Data Ethics', 'FastAPI'],
-    interests: ['Artificial Intelligence', 'Generative AI', 'Career Growth', 'Patient Safety', 'Data Ethics'],
-    career_goals: 'Targeting AI Research & Machine Learning Engineering roles at top tech companies.',
-    preferred_goals: ['Find a mentor', 'Explore career opportunities', 'Meet researchers'],
+    name: '',
+    status: 'Not Signed In',
+    skills: [],
+    interests: [],
+    career_goals: 'Set your career goals in the User Profile tab or Sign In.',
+    preferred_goals: [],
     conversation_style: 'Balanced (Technical + Professional)'
   });
 
   useEffect(() => {
-    api.getProfile().then(setProfile);
+    api.getProfile().then((res) => {
+      if (res) setProfile(res);
+    });
   }, []);
 
   const handleLogout = async () => {
     await api.logout();
     setProfile({
-      name: 'Guest User',
+      name: '',
       status: 'Not Signed In',
-      skills: ['Artificial Intelligence'],
-      interests: ['AI', 'Networking'],
-      career_goals: 'Please sign in to personalize career goals.',
-      preferred_goals: ['Build professional connections'],
+      skills: [],
+      interests: [],
+      career_goals: '',
+      preferred_goals: [],
       conversation_style: 'Balanced (Technical + Professional)'
     });
     setIsAuthOpen(true);

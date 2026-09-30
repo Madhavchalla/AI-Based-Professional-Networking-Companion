@@ -30,11 +30,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
     api.getPeople().then((data) => setRecentPeople(data.slice(0, 3)));
   }, []);
 
+  const userName = profile.name ? profile.name.split(' ')[0] : 'there';
+
   return (
     <div>
       <div className="header-banner">
         <span className="header-category">COMPREHENSIVE DASHBOARD</span>
-        <h1 className="header-title">Welcome back, {profile.name.split(' ')[0]}! 🤝</h1>
+        <h1 className="header-title">Welcome back{profile.name ? `, ${userName}` : ''}! 🤝</h1>
         <p className="header-subtitle">
           Your AI-powered networking assistant is ready. Analyze upcoming events, discover matching attendees, 
           and prepare multi-step conversation flows tailored to your goals.
@@ -47,7 +49,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
             <Calendar size={22} />
           </div>
           <div>
-            <div className="metric-value">{analytics?.total_events || 3}</div>
+            <div className="metric-value">{analytics?.total_events ?? 0}</div>
             <div className="metric-label">Events Analyzed</div>
           </div>
         </div>
@@ -57,7 +59,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
             <Users size={22} />
           </div>
           <div>
-            <div className="metric-value">{analytics?.total_people || 6}</div>
+            <div className="metric-value">{analytics?.total_people ?? 0}</div>
             <div className="metric-label">People Matched</div>
           </div>
         </div>
@@ -67,7 +69,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
             <MessageSquare size={22} />
           </div>
           <div>
-            <div className="metric-value">{analytics?.total_conversations || 14}</div>
+            <div className="metric-value">{analytics?.total_conversations ?? 0}</div>
             <div className="metric-label">Conversations Generated</div>
           </div>
         </div>
@@ -77,7 +79,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
             <ThumbsUp size={22} />
           </div>
           <div>
-            <div className="metric-value">{analytics?.positive_rate || 92}%</div>
+            <div className="metric-value">{analytics?.positive_rate ?? 0}%</div>
             <div className="metric-label">Positive Feedback</div>
           </div>
         </div>
@@ -117,14 +119,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
 
             {recentSessions.length === 0 ? (
               <div style={{ color: 'var(--text-muted)', fontSize: '14px', padding: '16px 0' }}>
-                No recent networking sessions. Click <strong>Create Session</strong> to prepare for your first event!
+                No recent networking sessions. Click <strong>Create Session</strong> to analyze your first event!
               </div>
             ) : (
               recentSessions.map((session, idx) => (
                 <div key={idx} style={{ padding: '12px 0', borderBottom: idx !== recentSessions.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h4 style={{ color: 'var(--text-main)', fontSize: '14px', fontWeight: 700 }}>{session.event_name || 'AI Healthcare Summit'}</h4>
-                    <span className="tag-badge-emerald">{session.goal || 'Find a mentor'}</span>
+                    <h4 style={{ color: 'var(--text-main)', fontSize: '14px', fontWeight: 700 }}>{session.event_name || 'Networking Event'}</h4>
+                    <span className="tag-badge-emerald">{session.goal || 'Build connections'}</span>
                   </div>
                   <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '4px' }}>
                     {session.event_description.length > 80 ? session.event_description.substring(0, 80) + '...' : session.event_description}
@@ -145,19 +147,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
             <h3 className="card-title">
               <Target size={18} color="#4f46e5" /> Your Active Goals
             </h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
-              {profile.preferred_goals.map((g, i) => (
-                <span key={i} className="tag-badge-indigo">{g}</span>
-              ))}
-            </div>
+            {profile.preferred_goals && profile.preferred_goals.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+                {profile.preferred_goals.map((g, i) => (
+                  <span key={i} className="tag-badge-indigo">{g}</span>
+                ))}
+              </div>
+            ) : (
+              <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '16px' }}>
+                No active goals set. Configure goals in <strong>User Profile</strong>.
+              </div>
+            )}
+            
             <h4 style={{ color: 'var(--text-sub)', fontSize: '13px', marginBottom: '6px', fontWeight: 600 }}>Interests:</h4>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-              {profile.interests.map((int, i) => (
-                <span key={i} className="tag-badge">
-                  {int}
-                </span>
-              ))}
-            </div>
+            {profile.interests && profile.interests.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {profile.interests.map((int, i) => (
+                  <span key={i} className="tag-badge">
+                    {int}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+                Add your interests in User Profile.
+              </div>
+            )}
           </div>
 
           <div className="card">
@@ -170,15 +185,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
               </button>
             </div>
 
-            {recentPeople.map((person, i) => (
-              <div key={i} style={{ padding: '10px 0', borderBottom: i !== recentPeople.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '14px' }}>{person.name}</span>
-                  <span className="tag-badge-emerald" style={{ fontSize: '11px' }}>{person.match_percentage}% match</span>
-                </div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{person.title}</div>
+            {recentPeople.length === 0 ? (
+              <div style={{ color: 'var(--text-muted)', fontSize: '13px', padding: '10px 0' }}>
+                No contacts saved yet. Click <strong>Add Person</strong> to match a contact!
               </div>
-            ))}
+            ) : (
+              recentPeople.map((person, i) => (
+                <div key={i} style={{ padding: '10px 0', borderBottom: i !== recentPeople.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '14px' }}>{person.name}</span>
+                    <span className="tag-badge-emerald" style={{ fontSize: '11px' }}>{person.match_percentage}% match</span>
+                  </div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{person.title}</div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

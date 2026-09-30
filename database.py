@@ -5,56 +5,21 @@ from datetime import datetime
 
 DB_FILE = "db.json"
 
+# Clean, real initial database without dummy accounts or fake metrics
 DEFAULT_DB = {
-    "users": [
-        {
-            "id": "user_1",
-            "name": "Challa Madhav",
-            "email": "challa@example.com",
-            "password_hash": hashlib.sha256("password123".encode()).hexdigest(),
-            "status": "AI Engineer & Researcher",
-            "skills": ["Machine Learning", "Python", "React", "Data Ethics", "FastAPI"],
-            "interests": ["Artificial Intelligence", "Generative AI", "Career Growth", "Patient Safety", "Data Ethics"],
-            "career_goals": "Targeting AI Research & Machine Learning Engineering roles at top tech companies.",
-            "preferred_goals": ["Find a mentor", "Explore career opportunities", "Meet researchers"],
-            "conversation_style": "Balanced (Technical + Professional)"
-        }
-    ],
+    "users": [],
     "profile": {
-        "name": "Challa Madhav",
-        "email": "challa@example.com",
-        "status": "AI Engineer & Researcher",
-        "skills": ["Machine Learning", "Python", "React", "Data Ethics", "FastAPI"],
-        "interests": ["Artificial Intelligence", "Generative AI", "Career Growth", "Patient Safety", "Data Ethics"],
-        "career_goals": "Targeting AI Research & Machine Learning Engineering roles at top tech companies.",
-        "preferred_goals": ["Find a mentor", "Explore career opportunities", "Meet researchers"],
+        "name": "",
+        "email": "",
+        "status": "Not Signed In",
+        "skills": [],
+        "interests": [],
+        "career_goals": "",
+        "preferred_goals": [],
         "conversation_style": "Balanced (Technical + Professional)"
     },
     "sessions": [],
-    "people": [
-        {
-            "id": "person_1",
-            "name": "Dr. Rahul Sharma",
-            "title": "Senior AI Researcher at BioHealth AI",
-            "interests": ["Generative AI", "Machine Learning", "Patient Safety", "Healthcare AI"],
-            "notes": "Met at AI Health Summit. Working on LLM safety in clinical diagnosis.",
-            "common_interests": ["Generative AI", "Machine Learning", "Patient Safety"],
-            "reason_to_connect": "High overlap in AI healthcare ethics and machine learning application.",
-            "suggested_opener": "What challenges are you seeing when deploying LLM models in patient care?",
-            "created_at": "2026-09-28T10:30:00"
-        },
-        {
-            "id": "person_2",
-            "name": "Priya Nair",
-            "title": "Lead Product Manager at CloudTech",
-            "interests": ["Career Growth", "Data Ethics", "AI Product Management"],
-            "notes": "Spoke about transition from ML engineering to AI product management.",
-            "common_interests": ["Career Growth", "Data Ethics"],
-            "reason_to_connect": "Great contact for career advice on AI product strategy.",
-            "suggested_opener": "How do you evaluate ethical tradeoffs when prioritizing AI feature roadmaps?",
-            "created_at": "2026-09-29T14:15:00"
-        }
-    ],
+    "people": [],
     "feedback": [],
     "preferences": {
         "technical_weight": 0.5,
@@ -81,7 +46,7 @@ def save_db(data):
         json.dump(data, f, indent=2)
 
 # Authentication & User Account Functions
-def register_user(name, email, password, status="AI Engineer"):
+def register_user(name, email, password, status="Professional"):
     db = load_db()
     users = db.get("users", [])
     
@@ -99,10 +64,10 @@ def register_user(name, email, password, status="AI Engineer"):
         "email": email_clean,
         "password_hash": pwd_hash,
         "status": status.strip() or "Professional",
-        "skills": ["Artificial Intelligence", "Python", "Networking"],
-        "interests": ["Artificial Intelligence", "Generative AI", "Career Growth"],
-        "career_goals": "Expand professional network and explore AI industry opportunities.",
-        "preferred_goals": ["Find a mentor", "Build professional connections"],
+        "skills": [],
+        "interests": [],
+        "career_goals": "Set your career goals in the User Profile tab.",
+        "preferred_goals": ["Build professional connections"],
         "conversation_style": "Balanced (Technical + Professional)"
     }
     
@@ -111,7 +76,6 @@ def register_user(name, email, password, status="AI Engineer"):
     db["profile"] = new_user  # Set active profile
     save_db(db)
     
-    # Return user object without password hash
     res = {k: v for k, v in new_user.items() if k != "password_hash"}
     res["token"] = f"token_{user_id}"
     return res
@@ -144,7 +108,6 @@ def get_profile():
 def update_profile(profile_data):
     db = load_db()
     db["profile"] = profile_data
-    # Also update in users array
     users = db.get("users", [])
     for u in users:
         if u.get("email") == profile_data.get("email"):
@@ -214,13 +177,17 @@ def log_feedback_item(starter_text, action, category="general"):
     save_db(db)
     return {"feedback": new_entry, "preferences": prefs}
 
+# Real, accurate analytics calculation
 def get_analytics():
     db = load_db()
     sessions = db.get("sessions", [])
     people = db.get("people", [])
     feedbacks = db.get("feedback", [])
     
-    total_conversations = sum(len(s.get("multi_step_flow", [])) for s in sessions) + len(feedbacks)
+    total_events = len(sessions)
+    total_people = len(people)
+    total_conversations = sum(len(s.get("multi_step_flow", [])) for s in sessions)
+    
     upvotes = len([f for f in feedbacks if f.get("feedback") == "like"])
     downvotes = len([f for f in feedbacks if f.get("feedback") == "dislike"])
     
@@ -234,13 +201,15 @@ def get_analytics():
         for t in s.get("topics", []):
             topic_counts[t] = topic_counts.get(t, 0) + 1
             
+    pos_rate = round((upvotes / (upvotes + downvotes) * 100), 1) if (upvotes + downvotes) > 0 else 0.0
+    
     return {
-        "total_events": len(sessions),
-        "total_people": len(people),
-        "total_conversations": max(total_conversations, len(sessions) * 3 + len(people)),
+        "total_events": total_events,
+        "total_people": total_people,
+        "total_conversations": total_conversations,
         "upvotes": upvotes,
         "downvotes": downvotes,
-        "positive_rate": round((upvotes / (upvotes + downvotes) * 100), 1) if (upvotes + downvotes) > 0 else 100.0,
+        "positive_rate": pos_rate,
         "goal_breakdown": goal_counts,
         "top_topics": sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:5],
         "preferences": db.get("preferences", DEFAULT_DB["preferences"])

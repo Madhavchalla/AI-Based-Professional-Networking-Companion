@@ -71,12 +71,12 @@ export const api = {
       const stored = localStorage.getItem('user_profile');
       if (stored) return JSON.parse(stored);
       return {
-        name: "Challa Madhav",
-        status: "AI Engineer & Researcher",
-        skills: ["Machine Learning", "Python", "React", "Data Ethics", "FastAPI"],
-        interests: ["Artificial Intelligence", "Generative AI", "Career Growth", "Patient Safety", "Data Ethics"],
-        career_goals: "Targeting AI Research & Machine Learning Engineering roles.",
-        preferred_goals: ["Find a mentor", "Explore career opportunities", "Meet researchers"],
+        name: "",
+        status: "Not Signed In",
+        skills: [],
+        interests: [],
+        career_goals: "",
+        preferred_goals: [],
         conversation_style: "Balanced (Technical + Professional)"
       };
     }
@@ -208,7 +208,7 @@ export const api = {
         event_name: payload.event_name,
         notes: payload.notes,
         email_subject: `Great meeting you at ${payload.event_name}!`,
-        followup_message: `Hi ${firstName},\n\nIt was a pleasure meeting you at ${payload.event_name}. I really enjoyed our conversation regarding "${payload.notes}".\n\nI'd love to stay connected and follow your work. Let me know if you'd be open to catching up for a brief coffee sometime!\n\nBest regards,\nChalla Madhav`
+        followup_message: `Hi ${firstName},\n\nIt was a pleasure meeting you at ${payload.event_name}. I really enjoyed our conversation regarding "${payload.notes}".\n\nI'd love to stay connected and follow your work. Let me know if you'd be open to catching up for a brief coffee sometime!\n\nBest regards,\nUser`
       };
     }
   },
@@ -260,30 +260,19 @@ export const api = {
       return await fetchJson<AnalyticsData>(`${API_BASE}/analytics`);
     } catch {
       return {
-        total_events: 5,
-        total_people: 8,
-        total_conversations: 18,
-        upvotes: 14,
-        downvotes: 2,
-        positive_rate: 87.5,
-        goal_breakdown: {
-          "Find a mentor": 3,
-          "Explore career opportunities": 2,
-          "Meet researchers": 2,
-          "Learn about industry trends": 1
-        },
-        top_topics: [
-          ["Artificial Intelligence", 5],
-          ["Generative AI", 4],
-          ["Patient Safety", 3],
-          ["Data Ethics", 2],
-          ["Machine Learning", 2]
-        ],
+        total_events: 0,
+        total_people: 0,
+        total_conversations: 0,
+        upvotes: 0,
+        downvotes: 0,
+        positive_rate: 0.0,
+        goal_breakdown: {},
+        top_topics: [],
         preferences: {
-          technical_weight: 0.8,
-          career_weight: 0.7,
-          industry_weight: 0.6,
-          research_weight: 0.75
+          technical_weight: 0.5,
+          career_weight: 0.5,
+          industry_weight: 0.5,
+          research_weight: 0.5
         }
       };
     }
