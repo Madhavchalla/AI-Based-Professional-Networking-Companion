@@ -10,8 +10,14 @@ import type {
 const API_BASE = 'http://localhost:8000/api';
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const token = localStorage.getItem('auth_token');
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...options,
   });
   if (!res.ok) {
@@ -22,11 +28,48 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Authentication
+  register: async (payload: { name: string; email: string; password: string; status?: string }): Promise<UserProfile & { token: string }> => {
+    const res = await fetchJson<UserProfile & { token: string }>(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (res.token) {
+      localStorage.setItem('auth_token', res.token);
+      localStorage.setItem('user_profile', JSON.stringify(res));
+    }
+    return res;
+  },
+
+  login: async (payload: { email: string; password: string }): Promise<UserProfile & { token: string }> => {
+    const res = await fetchJson<UserProfile & { token: string }>(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (res.token) {
+      localStorage.setItem('auth_token', res.token);
+      localStorage.setItem('user_profile', JSON.stringify(res));
+    }
+    return res;
+  },
+
+  logout: async (): Promise<void> => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_profile');
+    try {
+      await fetchJson(`${API_BASE}/auth/logout`, { method: 'POST' });
+    } catch {
+      // ignore
+    }
+  },
+
   // Profile
   getProfile: async (): Promise<UserProfile> => {
     try {
       return await fetchJson<UserProfile>(`${API_BASE}/profile`);
     } catch {
+      const stored = localStorage.getItem('user_profile');
+      if (stored) return JSON.parse(stored);
       return {
         name: "Challa Madhav",
         status: "AI Engineer & Researcher",
@@ -41,10 +84,12 @@ export const api = {
 
   updateProfile: async (profile: UserProfile): Promise<UserProfile> => {
     try {
-      return await fetchJson<UserProfile>(`${API_BASE}/profile`, {
+      const res = await fetchJson<UserProfile>(`${API_BASE}/profile`, {
         method: 'POST',
         body: JSON.stringify(profile),
       });
+      localStorage.setItem('user_profile', JSON.stringify(res));
+      return res;
     } catch {
       return profile;
     }

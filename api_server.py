@@ -14,8 +14,8 @@ import database
 
 app = FastAPI(
     title="AI-Based Professional Networking Companion API",
-    description="Backend API powering AI theme extraction, multi-step conversation flows, person matching, Wikipedia fact references, and follow-up generators.",
-    version="2.0.0"
+    description="Backend API powering AI theme extraction, multi-step conversation flows, person matching, Wikipedia fact references, follow-up generators, and user authentication.",
+    version="2.1.0"
 )
 
 # Enable CORS for React frontend
@@ -28,6 +28,16 @@ app.add_middleware(
 )
 
 # Pydantic Schemas
+class RegisterRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    status: Optional[str] = "AI Engineer & Researcher"
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
 class ProfileModel(BaseModel):
     name: str
     status: str
@@ -36,6 +46,7 @@ class ProfileModel(BaseModel):
     career_goals: str
     preferred_goals: List[str]
     conversation_style: str
+    email: Optional[str] = None
 
 class EventAnalyzeRequest(BaseModel):
     event_description: str
@@ -80,6 +91,33 @@ class SessionSaveRequest(BaseModel):
 def root():
     return {"message": "AI-Based Professional Networking Companion API Server is running."}
 
+# Authentication Routes
+@app.post("/api/auth/register")
+def register(req: RegisterRequest):
+    if not req.email.strip() or not req.password.strip():
+        raise HTTPException(status_code=400, detail="Email and password are required.")
+    res = database.register_user(req.name, req.email, req.password, req.status)
+    if "error" in res:
+        raise HTTPException(status_code=400, detail=res["error"])
+    return res
+
+@app.post("/api/auth/login")
+def login(req: LoginRequest):
+    if not req.email.strip() or not req.password.strip():
+        raise HTTPException(status_code=400, detail="Email and password are required.")
+    res = database.login_user(req.email, req.password)
+    if "error" in res:
+        raise HTTPException(status_code=401, detail=res["error"])
+    return res
+
+@app.get("/api/auth/me")
+def get_me():
+    return database.get_profile()
+
+@app.post("/api/auth/logout")
+def logout():
+    return {"message": "Logged out successfully."}
+
 # Profile Routes
 @app.get("/api/profile")
 def get_profile():
@@ -89,7 +127,7 @@ def get_profile():
 def update_profile(profile: ProfileModel):
     return database.update_profile(profile.dict())
 
-# Event Analysis Route (Preserves DistilBERT / Keyword engine)
+# Event Analysis Route
 @app.post("/api/analyze-event")
 def analyze_event(req: EventAnalyzeRequest):
     if not req.event_description.strip():
@@ -102,23 +140,18 @@ def analyze_event(req: EventAnalyzeRequest):
         "topics": topics
     }
 
-# Multi-Step Conversation Generator (Preserves & upgrades GPT-2 logic)
+# Multi-Step Conversation Generator
 @app.post("/api/generate-conversation")
 def generate_conversation_flow(req: MultiStepConversationRequest):
     event_desc = req.event_description.strip()
     user_interests = req.interests.strip()
     goal = req.networking_goal.strip() or "Build professional connections"
     
-    # 1. Extract themes if not provided
     themes = req.themes or extract_themes(event_desc, user_interests)
     themes_str = ", ".join(themes)
     
-    # 2. Get user preferences from DB for personalization tuning
     prefs = database.load_db().get("preferences", {})
-    tech_weight = prefs.get("technical_weight", 0.5)
-    career_weight = prefs.get("career_weight", 0.5)
     
-    # 3. Build multi-step flow tailored to Networking Goal & Interests
     opening = f"Hi! What brings you to this session on {themes[0] if themes else 'the event topics'}?"
     
     if "mentor" in goal.lower():
@@ -138,7 +171,6 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
         deeper = f"How do you see trends in {user_interests.split(',')[0] if user_interests else 'this area'} evolving over the next couple of years?"
         closing = f"It was fantastic exchanging ideas with you! Let's definitely stay connected on LinkedIn."
 
-    # Incorporate GPT-2 base starters
     gpt2_starters = generate_conversation_starters(event_desc, user_interests, themes)
 
     multi_step_flow = [
@@ -184,7 +216,6 @@ def match_person(req: PersonMatchRequest):
     user_interests = [i.lower().strip() for i in user_profile.get("interests", [])]
     person_interests = [i.strip() for i in req.person_interests]
     
-    # Calculate common interests
     common = []
     for pi in person_interests:
         for ui in user_interests:
@@ -216,12 +247,10 @@ def match_person(req: PersonMatchRequest):
         "notes": req.notes
     }
     
-    # Automatically save to database
     database.add_person(matched_person_obj)
-    
     return matched_person_obj
 
-# Wikipedia Fact Verification (Preserves existing Wikipedia API module)
+# Wikipedia Fact Verification
 @app.get("/api/wiki-reference")
 def get_wiki_reference(query: str):
     if not query.strip():
@@ -241,7 +270,6 @@ def generate_followup(req: FollowUpRequest):
     notes = req.notes.strip()
     
     first_name = name.split()[0]
-    
     subject = f"Great meeting you at {event}!"
     
     body = (
@@ -258,7 +286,7 @@ def generate_followup(req: FollowUpRequest):
         f"\n\nI'd love to stay in touch and follow your work. "
         f"Let me know if you'd ever be open to catching up for a brief virtual coffee!\n\n"
         f"Best regards,\n"
-        f"{database.get_profile().get('name', 'Alex Morgan')}"
+        f"{database.get_profile().get('name', 'Challa Madhav')}"
     )
     
     return {
