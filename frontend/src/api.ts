@@ -28,11 +28,11 @@ export const api = {
       return await fetchJson<UserProfile>(`${API_BASE}/profile`);
     } catch {
       return {
-        name: "Alex Morgan",
-        status: "Final Year AI & CS Student",
+        name: "Challa Madhav",
+        status: "AI Engineer & Researcher",
         skills: ["Machine Learning", "Python", "React", "Data Ethics", "FastAPI"],
         interests: ["Artificial Intelligence", "Generative AI", "Career Growth", "Patient Safety", "Data Ethics"],
-        career_goals: "Targeting AI Research & Machine Learning Engineering roles at top tech companies.",
+        career_goals: "Targeting AI Research & Machine Learning Engineering roles.",
         preferred_goals: ["Find a mentor", "Explore career opportunities", "Meet researchers"],
         conversation_style: "Balanced (Technical + Professional)"
       };
@@ -163,7 +163,7 @@ export const api = {
         event_name: payload.event_name,
         notes: payload.notes,
         email_subject: `Great meeting you at ${payload.event_name}!`,
-        followup_message: `Hi ${firstName},\n\nIt was a pleasure meeting you at ${payload.event_name}. I really enjoyed our conversation regarding "${payload.notes}".\n\nI'd love to stay connected and follow your work. Let me know if you'd be open to catching up for a brief coffee sometime!\n\nBest regards,\nAlex Morgan`
+        followup_message: `Hi ${firstName},\n\nIt was a pleasure meeting you at ${payload.event_name}. I really enjoyed our conversation regarding "${payload.notes}".\n\nI'd love to stay connected and follow your work. Let me know if you'd be open to catching up for a brief coffee sometime!\n\nBest regards,\nChalla Madhav`
       };
     }
   },

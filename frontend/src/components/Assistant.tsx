@@ -105,7 +105,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
 
       <div className="card">
         <h3 className="card-title">
-          <Layers size={20} color="#ff5e3a" /> 1. Event & Goals Configuration
+          <Layers size={18} color="#2563eb" /> 1. Event & Goals Configuration
         </h3>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -162,10 +162,10 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
 
       {sessionData && (
         <div>
-          <div className="card" style={{ background: 'rgba(0, 255, 208, 0.04)', borderColor: 'rgba(0, 255, 208, 0.2)' }}>
+          <div className="card" style={{ background: '#f8fafc', borderColor: '#e2e8f0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h4 style={{ color: '#00ffd0', fontSize: '14px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                <h4 style={{ color: '#16a34a', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   🧠 DistilBERT Extracted Event Themes:
                 </h4>
                 <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
@@ -174,7 +174,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
                       key={i}
                       className="tag-badge-emerald"
                       onClick={() => handleWikiLookup(t)}
-                      style={{ cursor: 'pointer', border: '1px solid #00ffd0' }}
+                      style={{ cursor: 'pointer' }}
                       title="Click for Wikipedia Quick Reference"
                     >
                       <BookOpen size={12} /> {t} (Wiki Reference)
@@ -189,9 +189,9 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
             </div>
 
             {wikiData && (
-              <div style={{ marginTop: '16px', padding: '16px', background: '#121826', borderRadius: '8px', borderLeft: '4px solid #00ffd0' }}>
+              <div style={{ marginTop: '16px', padding: '16px', background: '#ffffff', borderRadius: '8px', borderLeft: '4px solid #16a34a', border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <span style={{ fontWeight: 800, color: '#fff' }}>📖 Fact Reference: {wikiData.query}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>📖 Fact Reference: {wikiData.query}</span>
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{wikiData.source}</span>
                 </div>
                 <p style={{ color: 'var(--text-sub)', fontSize: '13px', lineHeight: '1.5' }}>
@@ -203,10 +203,10 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
 
           <div className="card">
             <h3 className="card-title">
-              <Sparkles size={20} color="#ff5e3a" /> 2. Multi-Step Natural Conversation Sequence
+              <Sparkles size={18} color="#2563eb" /> 2. Multi-Step Natural Conversation Sequence
             </h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '20px' }}>
-              A natural sequence designed around your selected goal: <strong style={{ color: '#fff' }}>{selectedGoal}</strong>
+              A natural sequence designed around your selected goal: <strong style={{ color: 'var(--text-main)' }}>{selectedGoal}</strong>
             </p>
 
             <div className="timeline-flow">
@@ -218,19 +218,19 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
                       <button
                         className="btn-icon-only"
                         onClick={() => handleFeedback(idx, item.question, 'like')}
-                        style={{ color: feedbackState[idx] === 'like' ? '#00ffd0' : 'var(--text-muted)' }}
+                        style={{ color: feedbackState[idx] === 'like' ? '#16a34a' : 'var(--text-muted)' }}
                       >
                         <ThumbsUp size={14} />
                       </button>
                       <button
                         className="btn-icon-only"
                         onClick={() => handleFeedback(idx, item.question, 'dislike')}
-                        style={{ color: feedbackState[idx] === 'dislike' ? '#ff5e3a' : 'var(--text-muted)' }}
+                        style={{ color: feedbackState[idx] === 'dislike' ? '#dc2626' : 'var(--text-muted)' }}
                       >
                         <ThumbsDown size={14} />
                       </button>
                       <button className="btn-icon-only" onClick={() => handleCopy(item.question, idx)}>
-                        {copiedIndex === idx ? <Check size={14} color="#00ffd0" /> : <Copy size={14} />}
+                        {copiedIndex === idx ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>

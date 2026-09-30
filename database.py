@@ -6,8 +6,8 @@ DB_FILE = "db.json"
 
 DEFAULT_DB = {
     "profile": {
-        "name": "Alex Morgan",
-        "status": "Final Year AI & CS Student",
+        "name": "Challa Madhav",
+        "status": "AI Engineer & Researcher",
         "skills": ["Machine Learning", "Python", "React", "Data Ethics", "FastAPI"],
         "interests": ["Artificial Intelligence", "Generative AI", "Career Growth", "Patient Safety", "Data Ethics"],
         "career_goals": "Targeting AI Research & Machine Learning Engineering roles at top tech companies.",
