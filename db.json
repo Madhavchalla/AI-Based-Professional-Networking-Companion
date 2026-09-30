@@ -1,0 +1,75 @@
+{
+  "profile": {
+    "name": "Alex Morgan",
+    "status": "Final Year AI & CS Student",
+    "skills": [
+      "Machine Learning",
+      "Python",
+      "React",
+      "Data Ethics",
+      "FastAPI"
+    ],
+    "interests": [
+      "Artificial Intelligence",
+      "Generative AI",
+      "Career Growth",
+      "Patient Safety",
+      "Data Ethics"
+    ],
+    "career_goals": "Targeting AI Research & Machine Learning Engineering roles at top tech companies.",
+    "preferred_goals": [
+      "Find a mentor",
+      "Explore career opportunities",
+      "Meet researchers"
+    ],
+    "conversation_style": "Balanced (Technical + Professional)"
+  },
+  "sessions": [],
+  "people": [
+    {
+      "id": "person_1",
+      "name": "Dr. Rahul Sharma",
+      "title": "Senior AI Researcher at BioHealth AI",
+      "interests": [
+        "Generative AI",
+        "Machine Learning",
+        "Patient Safety",
+        "Healthcare AI"
+      ],
+      "notes": "Met at AI Health Summit. Working on LLM safety in clinical diagnosis.",
+      "common_interests": [
+        "Generative AI",
+        "Machine Learning",
+        "Patient Safety"
+      ],
+      "reason_to_connect": "High overlap in AI healthcare ethics and machine learning application.",
+      "suggested_opener": "What challenges are you seeing when deploying LLM models in patient care?",
+      "created_at": "2026-09-28T10:30:00"
+    },
+    {
+      "id": "person_2",
+      "name": "Priya Nair",
+      "title": "Lead Product Manager at CloudTech",
+      "interests": [
+        "Career Growth",
+        "Data Ethics",
+        "AI Product Management"
+      ],
+      "notes": "Spoke about transition from ML engineering to AI product management.",
+      "common_interests": [
+        "Career Growth",
+        "Data Ethics"
+      ],
+      "reason_to_connect": "Great contact for career advice on AI product strategy.",
+      "suggested_opener": "How do you evaluate ethical tradeoffs when prioritizing AI feature roadmaps?",
+      "created_at": "2026-09-29T14:15:00"
+    }
+  ],
+  "feedback": [],
+  "preferences": {
+    "technical_weight": 0.5,
+    "career_weight": 0.5,
+    "industry_weight": 0.5,
+    "research_weight": 0.5
+  }
+}
