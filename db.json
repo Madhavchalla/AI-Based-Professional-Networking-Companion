@@ -1,0 +1,84 @@
+{
+  "users": [],
+  "profile": {
+    "name": "Guest User",
+    "email": "",
+    "status": "Not Signed In",
+    "skills": [],
+    "interests": [],
+    "career_goals": "",
+    "preferred_goals": [],
+    "conversation_style": "Balanced (Technical + Professional)"
+  },
+  "sessions": [
+    {
+      "event_name": "Networking Event",
+      "event_description": "A cybersecurity event is any observable occurrence or activity that may impact the security of an organization\u2019s information systems, networks, or data.",
+      "interests": "Ethical Hacking",
+      "goal": "Find a mentor",
+      "topics": [
+        "Ethical Hacking",
+        "Cybersecurity",
+        "Occurrence",
+        "Activity"
+      ],
+      "starters": [
+        {
+          "step": 1,
+          "stage": "Step 1 \u2022 Opening Icebreaker",
+          "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+          "options": [
+            "Hi! What brings you to this session on Ethical Hacking?",
+            "Hello! Have you been following the recent developments in Ethical Hacking, Cybersecurity, Occurrence, and Activity?",
+            "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+          ],
+          "question": "Hi! What brings you to this session on Ethical Hacking?"
+        },
+        {
+          "step": 2,
+          "stage": "Step 2 \u2022 Follow-Up Question",
+          "explanation": "Explores current work while aligning with your goal: 'Find a mentor'.",
+          "options": [
+            "I'm really interested in building expertise in Ethical Hacking. How did you navigate your career path in this domain?",
+            "As someone working around Ethical Hacking, Cybersecurity, Occurrence, and Activity, what advice would you give to someone looking to grow in this area?",
+            "What were some pivotal experiences or projects that helped you master Ethical Hacking?"
+          ],
+          "question": "I'm really interested in building expertise in Ethical Hacking. How did you navigate your career path in this domain?"
+        },
+        {
+          "step": 3,
+          "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+          "explanation": "Drives a meaningful conversation around Ethical Hacking, Cybersecurity, Occurrence, and Activity.",
+          "options": [
+            "Looking back at recent advancements in Ethical Hacking, Cybersecurity, Occurrence, and Activity, what's one key decision or architecture lesson that shaped your current approach?",
+            "How do you address open challenges like data quality, security, or ethics when working on Ethical Hacking?",
+            "Where do you see the biggest technical bottlenecks or breakthroughs happening in Ethical Hacking over the next couple of years?"
+          ],
+          "question": "Looking back at recent advancements in Ethical Hacking, Cybersecurity, Occurrence, and Activity, what's one key decision or architecture lesson that shaped your current approach?"
+        },
+        {
+          "step": 4,
+          "stage": "Step 4 \u2022 Connection & Closing Question",
+          "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+          "options": [
+            "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+            "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+            "I'd love to stay updated on your work with Ethical Hacking. May I follow up with you on LinkedIn?"
+          ],
+          "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+        }
+      ],
+      "notes": "",
+      "id": "session_1_1790811440",
+      "created_at": "2026-10-01T05:07:20.157294"
+    }
+  ],
+  "people": [],
+  "feedback": [],
+  "preferences": {
+    "technical_weight": 0.5,
+    "career_weight": 0.5,
+    "industry_weight": 0.5,
+    "research_weight": 0.5
+  }
+}
