@@ -17,9 +17,10 @@ import { api } from '../api';
 interface DashboardProps {
   profile: UserProfile;
   setActiveTab: (tab: string) => void;
+  refreshKey?: number;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab, refreshKey }) => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [recentSessions, setRecentSessions] = useState<ConversationSession[]>([]);
   const [recentPeople, setRecentPeople] = useState<MatchedPerson[]>([]);
@@ -28,7 +29,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab }) =
     api.getAnalytics().then(setAnalytics);
     api.getHistory().then((data) => setRecentSessions(data.slice(0, 3)));
     api.getPeople().then((data) => setRecentPeople(data.slice(0, 3)));
-  }, []);
+  }, [profile, refreshKey]);
 
   const userName = profile.name ? profile.name.split(' ')[0] : 'there';
 

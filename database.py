@@ -6,26 +6,8 @@ from datetime import datetime
 DB_FILE = "db.json"
 
 DEFAULT_DB = {
-    "users": [],
-    "profile": {
-        "name": "Guest User",
-        "email": "",
-        "status": "Not Signed In",
-        "skills": [],
-        "interests": [],
-        "career_goals": "",
-        "preferred_goals": [],
-        "conversation_style": "Balanced (Technical + Professional)"
-    },
-    "sessions": [],
-    "people": [],
-    "feedback": [],
-    "preferences": {
-        "technical_weight": 0.5,
-        "career_weight": 0.5,
-        "industry_weight": 0.5,
-        "research_weight": 0.5
-    }
+    "users": {},  # Maps token -> user_object
+    "email_to_token": {}  # Maps email -> token
 }
 
 def init_db():
@@ -44,112 +26,184 @@ def save_db(data):
     with open(DB_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
-# Authentication & User Account Functions
-def register_user(name, email, password, status="Professional"):
+# Get user by bearer token
+def get_user_by_token(token: str):
+    if not token or not token.strip():
+        return None
     db = load_db()
-    users = db.get("users", [])
+    users = db.get("users", {})
+    clean_token = token.replace("Bearer ", "").strip()
+    return users.get(clean_token)
+
+# Register User with 100% Isolated Data Space
+def register_user(name: str, email: str, password: str, status: str = "Professional"):
+    db = load_db()
+    users = db.get("users", {})
+    email_map = db.get("email_to_token", {})
     
     email_clean = email.strip().lower()
-    for u in users:
-        if u.get("email", "").lower() == email_clean:
-            return {"error": "An account with this email already exists."}
-            
+    if email_clean in email_map:
+        return {"error": "An account with this email already exists."}
+        
     pwd_hash = hashlib.sha256(password.encode()).hexdigest()
-    user_id = f"user_{len(users) + 1}_{int(datetime.now().timestamp())}"
+    user_id = f"usr_{int(datetime.now().timestamp() * 1000)}"
+    token = f"token_{user_id}_{hashlib.md5(email_clean.encode()).hexdigest()[:8]}"
     
-    new_user = {
+    user_obj = {
         "id": user_id,
+        "token": token,
         "name": name.strip(),
         "email": email_clean,
         "password_hash": pwd_hash,
         "status": status.strip() or "Professional",
         "skills": [],
         "interests": [],
-        "career_goals": "Set your career goals in the User Profile tab.",
+        "career_goals": "Configure your career goals in the User Profile tab.",
         "preferred_goals": ["Build professional connections"],
-        "conversation_style": "Balanced (Technical + Professional)"
+        "conversation_style": "Balanced (Technical + Professional)",
+        "sessions": [],
+        "people": [],
+        "feedback": [],
+        "preferences": {
+            "technical_weight": 0.5,
+            "career_weight": 0.5,
+            "industry_weight": 0.5,
+            "research_weight": 0.5
+        }
     }
     
-    users.append(new_user)
+    users[token] = user_obj
+    email_map[email_clean] = token
     db["users"] = users
-    db["profile"] = new_user  # Set active profile
+    db["email_to_token"] = email_map
     save_db(db)
     
-    res = {k: v for k, v in new_user.items() if k != "password_hash"}
-    res["token"] = f"token_{user_id}"
+    # Return user object without sensitive hash
+    res = {k: v for k, v in user_obj.items() if k not in ["password_hash", "sessions", "people", "feedback"]}
     return res
 
-def login_user(email, password):
+# Login User
+def login_user(email: str, password: str):
     db = load_db()
-    users = db.get("users", [])
+    email_map = db.get("email_to_token", {})
+    users = db.get("users", {})
     
     email_clean = email.strip().lower()
+    token = email_map.get(email_clean)
+    
+    if not token or token not in users:
+        return {"error": "No account found with this email. Please register."}
+        
+    user_obj = users[token]
     pwd_hash = hashlib.sha256(password.encode()).hexdigest()
     
-    for u in users:
-        if u.get("email", "").lower() == email_clean:
-            if u.get("password_hash") == pwd_hash or u.get("password") == password:
-                db["profile"] = u
-                save_db(db)
-                res = {k: v for k, v in u.items() if k != "password_hash"}
-                res["token"] = f"token_{u['id']}"
-                return res
-            else:
-                return {"error": "Invalid password. Please try again."}
-                
-    return {"error": "No account found with this email. Please register."}
+    if user_obj.get("password_hash") != pwd_hash:
+        return {"error": "Invalid password. Please try again."}
+        
+    res = {k: v for k, v in user_obj.items() if k not in ["password_hash", "sessions", "people", "feedback"]}
+    return res
 
-# Profile functions
-def get_profile():
-    db = load_db()
-    return db.get("profile", DEFAULT_DB["profile"])
+# Profile Functions (Token-Isolated)
+def get_profile(token: str = None):
+    user = get_user_by_token(token)
+    if not user:
+        return {
+            "name": "",
+            "email": "",
+            "status": "Not Signed In",
+            "skills": [],
+            "interests": [],
+            "career_goals": "",
+            "preferred_goals": [],
+            "conversation_style": "Balanced (Technical + Professional)"
+        }
+    return {
+        "name": user.get("name", ""),
+        "email": user.get("email", ""),
+        "status": user.get("status", ""),
+        "skills": user.get("skills", []),
+        "interests": user.get("interests", []),
+        "career_goals": user.get("career_goals", ""),
+        "preferred_goals": user.get("preferred_goals", []),
+        "conversation_style": user.get("conversation_style", "Balanced (Technical + Professional)")
+    }
 
-def update_profile(profile_data):
+def update_profile(profile_data: dict, token: str = None):
+    user = get_user_by_token(token)
+    if not user:
+        return profile_data
+        
     db = load_db()
-    db["profile"] = profile_data
-    users = db.get("users", [])
-    for u in users:
-        if u.get("email") == profile_data.get("email"):
-            u.update(profile_data)
-    db["users"] = users
-    save_db(db)
-    return db["profile"]
+    u_token = user["token"]
+    if u_token in db.get("users", {}):
+        db["users"][u_token]["name"] = profile_data.get("name", db["users"][u_token]["name"])
+        db["users"][u_token]["status"] = profile_data.get("status", db["users"][u_token]["status"])
+        db["users"][u_token]["skills"] = profile_data.get("skills", db["users"][u_token]["skills"])
+        db["users"][u_token]["interests"] = profile_data.get("interests", db["users"][u_token]["interests"])
+        db["users"][u_token]["career_goals"] = profile_data.get("career_goals", db["users"][u_token]["career_goals"])
+        db["users"][u_token]["preferred_goals"] = profile_data.get("preferred_goals", db["users"][u_token]["preferred_goals"])
+        db["users"][u_token]["conversation_style"] = profile_data.get("conversation_style", db["users"][u_token]["conversation_style"])
+        save_db(db)
+        return get_profile(u_token)
+    return profile_data
 
-# Sessions / History functions
-def get_sessions():
-    db = load_db()
-    return db.get("sessions", [])
+# User-Isolated Sessions / History Functions
+def get_sessions(token: str = None):
+    user = get_user_by_token(token)
+    if not user:
+        return []
+    return user.get("sessions", [])
 
-def add_session(session):
+def add_session(session: dict, token: str = None):
+    user = get_user_by_token(token)
+    if not user:
+        return {"error": "Authentication required to save networking sessions."}
+        
     db = load_db()
-    if "sessions" not in db:
-        db["sessions"] = []
-    session["id"] = f"session_{len(db['sessions']) + 1}_{int(datetime.now().timestamp())}"
+    u_token = user["token"]
+    user_sessions = db["users"][u_token].get("sessions", [])
+    
+    session["id"] = f"session_{len(user_sessions) + 1}_{int(datetime.now().timestamp())}"
     session["created_at"] = datetime.now().isoformat()
-    db["sessions"].insert(0, session)
+    
+    user_sessions.insert(0, session)
+    db["users"][u_token]["sessions"] = user_sessions
     save_db(db)
     return session
 
-# People matching functions
-def get_people():
-    db = load_db()
-    return db.get("people", [])
+# User-Isolated Contacts / People Functions
+def get_people(token: str = None):
+    user = get_user_by_token(token)
+    if not user:
+        return []
+    return user.get("people", [])
 
-def add_person(person):
+def add_person(person: dict, token: str = None):
+    user = get_user_by_token(token)
+    if not user:
+        return {"error": "Authentication required to save contacts."}
+        
     db = load_db()
-    if "people" not in db:
-        db["people"] = []
-    person["id"] = f"person_{len(db['people']) + 1}_{int(datetime.now().timestamp())}"
+    u_token = user["token"]
+    user_people = db["users"][u_token].get("people", [])
+    
+    person["id"] = f"person_{len(user_people) + 1}_{int(datetime.now().timestamp())}"
     person["created_at"] = datetime.now().isoformat()
-    db["people"].insert(0, person)
+    
+    user_people.insert(0, person)
+    db["users"][u_token]["people"] = user_people
     save_db(db)
     return person
 
-# Feedback functions
-def log_feedback_item(starter_text, action, category="general"):
+# User-Isolated Feedback Functions
+def log_feedback_item(starter_text: str, action: str, category: str = "general", token: str = None):
+    user = get_user_by_token(token)
+    if not user:
+        return {"success": True}
+        
     db = load_db()
-    if "feedback" not in db:
-        db["feedback"] = []
+    u_token = user["token"]
+    user_feedback = db["users"][u_token].get("feedback", [])
     
     new_entry = {
         "timestamp": datetime.now().isoformat(),
@@ -157,30 +211,30 @@ def log_feedback_item(starter_text, action, category="general"):
         "feedback": action,
         "category": category
     }
-    db["feedback"].insert(0, new_entry)
-    
-    prefs = db.get("preferences", DEFAULT_DB["preferences"])
-    text_lower = starter_text.lower()
-    
-    delta = 0.1 if action == "like" else -0.1
-    if any(w in text_lower for w in ["model", "algorithm", "technical", "code", "architecture", "data", "ml", "bert", "gpt"]):
-        prefs["technical_weight"] = max(0.1, min(1.0, prefs.get("technical_weight", 0.5) + delta))
-    if any(w in text_lower for w in ["career", "role", "growth", "mentor", "internship", "job", "opportunity", "hire"]):
-        prefs["career_weight"] = max(0.1, min(1.0, prefs.get("career_weight", 0.5) + delta))
-    if any(w in text_lower for w in ["trend", "industry", "market", "field", "future", "product"]):
-        prefs["industry_weight"] = max(0.1, min(1.0, prefs.get("industry_weight", 0.5) + delta))
-    if any(w in text_lower for w in ["research", "paper", "study", "experiment", "ethics", "finding"]):
-        prefs["research_weight"] = max(0.1, min(1.0, prefs.get("research_weight", 0.5) + delta))
-        
-    db["preferences"] = prefs
+    user_feedback.insert(0, new_entry)
+    db["users"][u_token]["feedback"] = user_feedback
     save_db(db)
-    return {"feedback": new_entry, "preferences": prefs}
+    return {"feedback": new_entry}
 
-def get_analytics():
-    db = load_db()
-    sessions = db.get("sessions", [])
-    people = db.get("people", [])
-    feedbacks = db.get("feedback", [])
+# User-Isolated Analytics
+def get_analytics(token: str = None):
+    user = get_user_by_token(token)
+    if not user:
+        return {
+            "total_events": 0,
+            "total_people": 0,
+            "total_conversations": 0,
+            "upvotes": 0,
+            "downvotes": 0,
+            "positive_rate": 0.0,
+            "goal_breakdown": {},
+            "top_topics": [],
+            "preferences": {"technical_weight": 0.5, "career_weight": 0.5, "industry_weight": 0.5, "research_weight": 0.5}
+        }
+        
+    sessions = user.get("sessions", [])
+    people = user.get("people", [])
+    feedbacks = user.get("feedback", [])
     
     total_events = len(sessions)
     total_people = len(people)
@@ -210,5 +264,5 @@ def get_analytics():
         "positive_rate": pos_rate,
         "goal_breakdown": goal_counts,
         "top_topics": sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:5],
-        "preferences": db.get("preferences", DEFAULT_DB["preferences"])
+        "preferences": user.get("preferences", {"technical_weight": 0.5, "career_weight": 0.5, "industry_weight": 0.5, "research_weight": 0.5})
     }

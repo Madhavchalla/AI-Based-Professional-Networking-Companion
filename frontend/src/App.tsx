@@ -15,6 +15,7 @@ import { api } from './api';
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [profile, setProfile] = useState<UserProfile>({
     name: '',
     status: 'Not Signed In',
@@ -25,11 +26,15 @@ export default function App() {
     conversation_style: 'Balanced (Technical + Professional)'
   });
 
+  const handleDataChange = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
+
   useEffect(() => {
     api.getProfile().then((res) => {
       if (res) setProfile(res);
     });
-  }, []);
+  }, [refreshKey]);
 
   const handleLogout = async () => {
     await api.logout();
@@ -42,6 +47,7 @@ export default function App() {
       preferred_goals: [],
       conversation_style: 'Balanced (Technical + Professional)'
     });
+    handleDataChange();
     setIsAuthOpen(true);
   };
 
@@ -56,20 +62,37 @@ export default function App() {
       />
 
       <main className="main-content">
-        {activeTab === 'dashboard' && <Dashboard profile={profile} setActiveTab={setActiveTab} />}
-        {activeTab === 'assistant' && <Assistant profile={profile} />}
-        {activeTab === 'person-matcher' && <PersonMatcher profile={profile} />}
-        {activeTab === 'follow-up' && <FollowUpAssistant />}
-        {activeTab === 'topic-ref' && <TopicReference />}
-        {activeTab === 'history' && <HistoryPage />}
-        {activeTab === 'analytics' && <AnalyticsPage />}
-        {activeTab === 'profile' && <UserProfileView profile={profile} setProfile={setProfile} />}
+        <div style={{ display: activeTab === 'dashboard' ? 'block' : 'none' }}>
+          <Dashboard profile={profile} setActiveTab={setActiveTab} refreshKey={refreshKey} />
+        </div>
+        <div style={{ display: activeTab === 'assistant' ? 'block' : 'none' }}>
+          <Assistant profile={profile} onDataChange={handleDataChange} />
+        </div>
+        <div style={{ display: activeTab === 'person-matcher' ? 'block' : 'none' }}>
+          <PersonMatcher profile={profile} onDataChange={handleDataChange} refreshKey={refreshKey} />
+        </div>
+        <div style={{ display: activeTab === 'follow-up' ? 'block' : 'none' }}>
+          <FollowUpAssistant />
+        </div>
+        <div style={{ display: activeTab === 'topic-ref' ? 'block' : 'none' }}>
+          <TopicReference />
+        </div>
+        <div style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
+          <HistoryPage profile={profile} onOpenAuth={() => setIsAuthOpen(true)} refreshKey={refreshKey} />
+        </div>
+        <div style={{ display: activeTab === 'analytics' ? 'block' : 'none' }}>
+          <AnalyticsPage profile={profile} refreshKey={refreshKey} />
+        </div>
+        <div style={{ display: activeTab === 'profile' ? 'block' : 'none' }}>
+          <UserProfileView profile={profile} setProfile={setProfile} onDataChange={handleDataChange} />
+        </div>
       </main>
 
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onSuccess={(updatedProfile) => setProfile(updatedProfile)}
+        onDataChange={handleDataChange}
       />
     </div>
   );

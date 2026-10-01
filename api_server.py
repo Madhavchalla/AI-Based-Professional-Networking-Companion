@@ -1,6 +1,6 @@
 import os
 from typing import List, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -15,7 +15,7 @@ import database
 app = FastAPI(
     title="AI-Based Professional Networking Companion API",
     description="Backend API powering AI theme extraction, multi-step conversation flows, person matching, Wikipedia fact references, follow-up generators, and user authentication.",
-    version="2.3.0"
+    version="2.4.0"
 )
 
 # Enable CORS for React frontend
@@ -121,8 +121,8 @@ def login(req: LoginRequest):
     return res
 
 @app.get("/api/auth/me")
-def get_me():
-    return database.get_profile()
+def get_me(authorization: Optional[str] = Header(None)):
+    return database.get_profile(authorization)
 
 @app.post("/api/auth/logout")
 def logout():
@@ -130,12 +130,12 @@ def logout():
 
 # Profile Routes
 @app.get("/api/profile")
-def get_profile():
-    return database.get_profile()
+def get_profile(authorization: Optional[str] = Header(None)):
+    return database.get_profile(authorization)
 
 @app.post("/api/profile")
-def update_profile(profile: ProfileModel):
-    return database.update_profile(profile.dict())
+def update_profile(profile: ProfileModel, authorization: Optional[str] = Header(None)):
+    return database.update_profile(profile.dict(), authorization)
 
 # Event Analysis Route
 @app.post("/api/analyze-event")
@@ -178,14 +178,12 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
     primary_interest = user_interests.split(',')[0].strip() if user_interests else themes[0]
     first_theme = themes[0] if themes else "this topic"
     
-    # Phase 1: Opening Icebreakers (3 Options)
     openers = [
         f"Hi! What brings you to this session on {first_theme}?",
         f"Hello! Have you been following the recent developments in {themes_str}?",
         f"Hi there! What has been the most interesting talk or topic for you at this event so far?"
     ]
     
-    # Phase 2: Goal-Aligned Follow-Ups (3 Options)
     if "mentor" in goal.lower():
         follow_ups = [
             f"I'm really interested in building expertise in {primary_interest}. How did you navigate your career path in this domain?",
@@ -211,14 +209,12 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
             f"What has been your main focus or initiative recently regarding {primary_interest}?"
         ]
 
-    # Phase 3: Deeper Technical / Industry Questions (3 Options)
     deeper_questions = [
         f"Looking back at recent advancements in {themes_str}, what's one key decision or architecture lesson that shaped your current approach?",
         f"How do you address open challenges like data quality, security, or ethics when working on {primary_interest}?",
         f"Where do you see the biggest technical bottlenecks or breakthroughs happening in {first_theme} over the next couple of years?"
     ]
 
-    # Phase 4: Connection & Closing Questions (3 Options)
     closings = [
         f"I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
         f"This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
@@ -269,7 +265,7 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
 
 # Smart Person & Interest Matcher
 @app.post("/api/match-person")
-def match_person(req: PersonMatchRequest):
+def match_person(req: PersonMatchRequest, authorization: Optional[str] = Header(None)):
     person_name = req.name.strip()
     person_title = req.title.strip()
     person_interests = [i.strip() for i in req.person_interests if i.strip()]
@@ -277,7 +273,7 @@ def match_person(req: PersonMatchRequest):
     if not person_name or not person_title:
         raise HTTPException(status_code=400, detail="Person name and title/role are required for matching.")
         
-    user_profile = database.get_profile()
+    user_profile = database.get_profile(authorization)
     user_interests = [i.lower().strip() for i in user_profile.get("interests", [])]
     
     common = []
@@ -311,7 +307,13 @@ def match_person(req: PersonMatchRequest):
         "notes": req.notes
     }
     
-    database.add_person(matched_person_obj)
+    res = database.add_person(matched_person_obj, authorization)
+    if isinstance(res, dict) and "error" in res:
+        matched_person_obj["saved"] = False
+        matched_person_obj["save_message"] = res["error"]
+    else:
+        matched_person_obj["saved"] = True
+        
     return matched_person_obj
 
 # Wikipedia Fact Verification
@@ -328,7 +330,7 @@ def get_wiki_reference(query: str):
 
 # Post-Conversation Follow-Up Assistant
 @app.post("/api/generate-followup")
-def generate_followup(req: FollowUpRequest):
+def generate_followup(req: FollowUpRequest, authorization: Optional[str] = Header(None)):
     name = req.person_name.strip()
     event = req.event_name.strip()
     notes = req.notes.strip()
@@ -339,7 +341,8 @@ def generate_followup(req: FollowUpRequest):
     first_name = name.split()[0]
     subject = f"Great meeting you at {event}!"
     
-    profile_name = database.get_profile().get('name')
+    profile = database.get_profile(authorization)
+    profile_name = profile.get('name', '')
     sender = profile_name if (profile_name and profile_name != "Guest User") else "Professional Networker"
     
     body = (
@@ -358,26 +361,30 @@ def generate_followup(req: FollowUpRequest):
         "followup_message": body
     }
 
-# History & Session Management
+# User-Scoped History & Session Management
 @app.get("/api/history")
-def get_history():
-    return database.get_sessions()
+def get_history(authorization: Optional[str] = Header(None)):
+    return database.get_sessions(authorization)
 
 @app.post("/api/history")
-def save_session(session: SessionSaveRequest):
-    return database.add_session(session.dict())
+def save_session(session: SessionSaveRequest, authorization: Optional[str] = Header(None)):
+    res = database.add_session(session.dict(), authorization)
+    if isinstance(res, dict) and "error" in res:
+        raise HTTPException(status_code=401, detail=res["error"])
+    return res
 
-# Saved People List
+# User-Scoped Saved People List
 @app.get("/api/people")
-def get_people():
-    return database.get_people()
+def get_people(authorization: Optional[str] = Header(None)):
+    return database.get_people(authorization)
 
 # Feedback Logger
 @app.post("/api/feedback")
-def log_feedback(req: FeedbackRequest):
-    return database.log_feedback_item(req.starter_text, req.action, req.category)
+def log_feedback(req: FeedbackRequest, authorization: Optional[str] = Header(None)):
+    return database.log_feedback_item(req.starter_text, req.action, req.category, authorization)
 
 # Analytics Endpoint
 @app.get("/api/analytics")
-def get_analytics():
-    return database.get_analytics()
+def get_analytics(authorization: Optional[str] = Header(None)):
+    return database.get_analytics(authorization)
+

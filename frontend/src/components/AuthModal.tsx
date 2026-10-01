@@ -7,9 +7,10 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (profile: UserProfile) => void;
+  onDataChange?: () => void;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, onDataChange }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,10 +30,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
       if (isLogin) {
         const res = await api.login({ email, password });
         onSuccess(res);
+        if (onDataChange) onDataChange();
         onClose();
       } else {
         const res = await api.register({ name, email, password, status });
         onSuccess(res);
+        if (onDataChange) onDataChange();
         onClose();
       }
     } catch (err: any) {

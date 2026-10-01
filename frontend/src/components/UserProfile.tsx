@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Save } from 'lucide-react';
 import type { UserProfile as UserProfileType } from '../types';
 import { api } from '../api';
@@ -6,16 +6,26 @@ import { api } from '../api';
 interface UserProfileProps {
   profile: UserProfileType;
   setProfile: (p: UserProfileType) => void;
+  onDataChange?: () => void;
 }
 
-export const UserProfileView: React.FC<UserProfileProps> = ({ profile, setProfile }) => {
+export const UserProfileView: React.FC<UserProfileProps> = ({ profile, setProfile, onDataChange }) => {
   const [name, setName] = useState(profile.name);
   const [status, setStatus] = useState(profile.status);
-  const [skills, setSkills] = useState(profile.skills.join(', '));
-  const [interests, setInterests] = useState(profile.interests.join(', '));
+  const [skills, setSkills] = useState(profile.skills ? profile.skills.join(', ') : '');
+  const [interests, setInterests] = useState(profile.interests ? profile.interests.join(', ') : '');
   const [careerGoals, setCareerGoals] = useState(profile.career_goals);
   const [style, setStyle] = useState(profile.conversation_style);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    setName(profile.name || '');
+    setStatus(profile.status || '');
+    setSkills(profile.skills ? profile.skills.join(', ') : '');
+    setInterests(profile.interests ? profile.interests.join(', ') : '');
+    setCareerGoals(profile.career_goals || '');
+    setStyle(profile.conversation_style || 'Balanced (Technical + Professional)');
+  }, [profile]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +42,7 @@ export const UserProfileView: React.FC<UserProfileProps> = ({ profile, setProfil
     const res = await api.updateProfile(updated);
     setProfile(res);
     setSavedSuccess(true);
+    if (onDataChange) onDataChange();
     setTimeout(() => setSavedSuccess(false), 3000);
   };
 

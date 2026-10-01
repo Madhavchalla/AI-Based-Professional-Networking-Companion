@@ -15,9 +15,10 @@ import { api } from '../api';
 
 interface AssistantProps {
   profile: UserProfile;
+  onDataChange?: () => void;
 }
 
-export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
+export const Assistant: React.FC<AssistantProps> = ({ profile, onDataChange }) => {
   const [eventName, setEventName] = useState('');
   const [eventDesc, setEventDesc] = useState('');
   const [interests, setInterests] = useState(profile.interests ? profile.interests.join(', ') : '');
@@ -61,6 +62,20 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
         networking_goal: selectedGoal
       });
       setSessionData(res);
+      
+      // Auto save for signed-in users so Dashboard & History update instantly
+      if (profile.name && profile.name !== "Guest User") {
+        await api.saveSession({
+          event_name: eventName || 'Networking Event',
+          event_description: eventDesc,
+          interests: interests,
+          goal: selectedGoal,
+          topics: res.topics || [],
+          starters: res.multi_step_flow || []
+        });
+        setSavedSuccess(true);
+        if (onDataChange) onDataChange();
+      }
     } catch (e: any) {
       setErrorMsg(e.message || 'Failed to generate conversation starters. Please check your inputs.');
     } finally {
@@ -80,6 +95,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
   const handleFeedback = (key: string, text: string, action: 'like' | 'dislike') => {
     setFeedbackState((prev) => ({ ...prev, [key]: action }));
     api.logFeedback(text, action, selectedGoal);
+    if (onDataChange) onDataChange();
   };
 
   const handleCopy = (text: string, key: string) => {
@@ -99,6 +115,7 @@ export const Assistant: React.FC<AssistantProps> = ({ profile }) => {
       starters: sessionData.multi_step_flow || []
     });
     setSavedSuccess(true);
+    if (onDataChange) onDataChange();
   };
 
   return (

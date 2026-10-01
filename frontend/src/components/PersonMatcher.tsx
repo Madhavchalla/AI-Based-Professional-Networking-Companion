@@ -5,9 +5,11 @@ import { api } from '../api';
 
 interface PersonMatcherProps {
   profile: UserProfile;
+  onDataChange?: () => void;
+  refreshKey?: number;
 }
 
-export const PersonMatcher: React.FC<PersonMatcherProps> = ({ profile }) => {
+export const PersonMatcher: React.FC<PersonMatcherProps> = ({ profile, onDataChange, refreshKey }) => {
   const [name, setName] = useState('');
   const [title, setTitle] = useState('');
   const [personInterests, setPersonInterests] = useState('');
@@ -19,7 +21,7 @@ export const PersonMatcher: React.FC<PersonMatcherProps> = ({ profile }) => {
 
   useEffect(() => {
     api.getPeople().then(setSavedPeople);
-  }, []);
+  }, [profile, refreshKey]);
 
   const handleMatch = async () => {
     setErrorMsg('');
@@ -40,6 +42,7 @@ export const PersonMatcher: React.FC<PersonMatcherProps> = ({ profile }) => {
       setMatchedResult(res);
       const updated = await api.getPeople();
       setSavedPeople(updated);
+      if (onDataChange) onDataChange();
     } catch (e: any) {
       setErrorMsg(e.message || 'Matching failed. Please check your inputs.');
     } finally {
