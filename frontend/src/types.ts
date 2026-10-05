@@ -22,7 +22,8 @@ export interface ConversationSession {
   interests: string;
   goal: string;
   topics: string[];
-  multi_step_flow: MultiStepQuestion[];
+  multi_step_flow?: MultiStepQuestion[];
+  starters?: any[];
   gpt2_base_starters?: string[];
   notes?: string;
   created_at?: string;

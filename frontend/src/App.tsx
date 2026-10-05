@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { Assistant } from './components/Assistant';
-import { PersonMatcher } from './components/PersonMatcher';
 import { FollowUpAssistant } from './components/FollowUpAssistant';
 import { TopicReference } from './components/TopicReference';
 import { HistoryPage } from './components/HistoryPage';
@@ -67,9 +66,6 @@ export default function App() {
         </div>
         <div style={{ display: activeTab === 'assistant' ? 'block' : 'none' }}>
           <Assistant profile={profile} onDataChange={handleDataChange} />
-        </div>
-        <div style={{ display: activeTab === 'person-matcher' ? 'block' : 'none' }}>
-          <PersonMatcher profile={profile} onDataChange={handleDataChange} refreshKey={refreshKey} />
         </div>
         <div style={{ display: activeTab === 'follow-up' ? 'block' : 'none' }}>
           <FollowUpAssistant />

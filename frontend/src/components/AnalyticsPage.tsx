@@ -44,8 +44,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({ profile, refreshKe
             <Award size={24} />
           </div>
           <div>
-            <div className="metric-value">{analytics.total_people}</div>
-            <div className="metric-label">People Matched</div>
+            <div className="metric-value">{analytics.total_events}</div>
+            <div className="metric-label">Saved Sessions</div>
           </div>
         </div>
 

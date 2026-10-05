@@ -8,10 +8,9 @@ import {
   ArrowRight, 
   TrendingUp, 
   BookOpen,
-  ThumbsUp,
-  UserCheck
+  ThumbsUp
 } from 'lucide-react';
-import type { UserProfile, AnalyticsData, ConversationSession, MatchedPerson } from '../types';
+import type { UserProfile, AnalyticsData, ConversationSession } from '../types';
 import { api } from '../api';
 
 interface DashboardProps {
@@ -23,12 +22,10 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab, refreshKey }) => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [recentSessions, setRecentSessions] = useState<ConversationSession[]>([]);
-  const [recentPeople, setRecentPeople] = useState<MatchedPerson[]>([]);
 
   useEffect(() => {
     api.getAnalytics().then(setAnalytics);
     api.getHistory().then((data) => setRecentSessions(data.slice(0, 3)));
-    api.getPeople().then((data) => setRecentPeople(data.slice(0, 3)));
   }, [profile, refreshKey]);
 
   const userName = profile.name ? profile.name.split(' ')[0] : 'there';
@@ -92,12 +89,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab, ref
             <h3 className="card-title">
               <Sparkles size={18} color="#2563eb" /> Quick Actions
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginTop: '12px' }}>
               <button className="btn btn-primary" onClick={() => setActiveTab('assistant')}>
                 <MessageSquare size={16} /> Create Session
-              </button>
-              <button className="btn btn-secondary" onClick={() => setActiveTab('person-matcher')}>
-                <UserCheck size={16} /> Find Person Match
               </button>
               <button className="btn btn-secondary" onClick={() => setActiveTab('follow-up')}>
                 <TrendingUp size={16} /> Write Follow-Up
@@ -173,33 +167,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, setActiveTab, ref
               <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
                 Add your interests in User Profile.
               </div>
-            )}
-          </div>
-
-          <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h3 className="card-title" style={{ margin: 0 }}>
-                <Users size={18} color="#2563eb" /> Matched People
-              </h3>
-              <button className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={() => setActiveTab('person-matcher')}>
-                Add Person
-              </button>
-            </div>
-
-            {recentPeople.length === 0 ? (
-              <div style={{ color: 'var(--text-muted)', fontSize: '13px', padding: '10px 0' }}>
-                No contacts saved yet. Click <strong>Add Person</strong> to match a contact!
-              </div>
-            ) : (
-              recentPeople.map((person, i) => (
-                <div key={i} style={{ padding: '10px 0', borderBottom: i !== recentPeople.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '14px' }}>{person.name}</span>
-                    <span className="tag-badge-emerald" style={{ fontSize: '11px' }}>{person.match_percentage}% match</span>
-                  </div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{person.title}</div>
-                </div>
-              ))
             )}
           </div>
         </div>

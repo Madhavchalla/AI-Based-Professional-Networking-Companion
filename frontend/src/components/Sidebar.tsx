@@ -2,7 +2,6 @@ import React from 'react';
 import { 
   LayoutDashboard, 
   MessageSquarePlus, 
-  Users, 
   Send, 
   BookOpen, 
   History, 
@@ -32,7 +31,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'assistant', label: 'Networking Assistant', icon: MessageSquarePlus },
-    { id: 'person-matcher', label: 'Smart Person Matcher', icon: Users },
     { id: 'follow-up', label: 'Follow-Up Assistant', icon: Send },
     { id: 'topic-ref', label: 'Topic Reference', icon: BookOpen },
     { id: 'history', label: 'Networking History', icon: History },

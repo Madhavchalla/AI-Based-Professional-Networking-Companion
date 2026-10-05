@@ -16,6 +16,494 @@
       "conversation_style": "Balanced (Technical + Professional)",
       "sessions": [
         {
+          "event_name": "Generative AI",
+          "event_description": "artificial intelligence focused on creating new, original content rather than just analyzing existing data",
+          "interests": "LLM's and RAG",
+          "goal": "Find a mentor",
+          "topics": [
+            "Llm'S And Rag",
+            "Artificial",
+            "Intelligence",
+            "Focused"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Llm'S And Rag?",
+                "Hello! Have you been following the recent developments in Llm'S And Rag, Artificial, Intelligence, and Focused?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Llm'S And Rag?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Find a mentor'.",
+              "options": [
+                "I'm really interested in building expertise in LLM's and RAG. How did you navigate your career path in this domain?",
+                "As someone working around Llm'S And Rag, Artificial, Intelligence, and Focused, what advice would you give to someone looking to grow in this area?",
+                "What were some pivotal experiences or projects that helped you master LLM's and RAG?"
+              ],
+              "question": "I'm really interested in building expertise in LLM's and RAG. How did you navigate your career path in this domain?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Llm'S And Rag, Artificial, Intelligence, and Focused.",
+              "options": [
+                "Looking back at recent advancements in Llm'S And Rag, Artificial, Intelligence, and Focused, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on LLM's and RAG?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Llm'S And Rag over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Llm'S And Rag, Artificial, Intelligence, and Focused, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with LLM's and RAG. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_13_1791177251",
+          "created_at": "2026-10-05T10:44:11.863822"
+        },
+        {
+          "event_name": "Defending the Digital Frontline: Cybersecurity Essentials",
+          "event_description": "In today's hyper-connected landscape, cyber threats are growing more sophisticated by the day. This interactive, hands-on workshop skips the dense technical jargon and delivers practical, real-world strategies to protect sensitive organizational and personal data. Attendees will learn to think like a defender, discover how modern social engineering works, and walk away with a personalized checklist to secure their digital footprints instantly.",
+          "interests": "Ethical Hacking",
+          "goal": "Find a mentor",
+          "topics": [
+            "Ethical Hacking",
+            "Today",
+            "Hyper-connected",
+            "Landscape"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Ethical Hacking?",
+                "Hello! Have you been following the recent developments in Ethical Hacking, Today, Hyper-connected, and Landscape?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Ethical Hacking?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Find a mentor'.",
+              "options": [
+                "I'm really interested in building expertise in Ethical Hacking. How did you navigate your career path in this domain?",
+                "As someone working around Ethical Hacking, Today, Hyper-connected, and Landscape, what advice would you give to someone looking to grow in this area?",
+                "What were some pivotal experiences or projects that helped you master Ethical Hacking?"
+              ],
+              "question": "I'm really interested in building expertise in Ethical Hacking. How did you navigate your career path in this domain?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Ethical Hacking, Today, Hyper-connected, and Landscape.",
+              "options": [
+                "Looking back at recent advancements in Ethical Hacking, Today, Hyper-connected, and Landscape, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on Ethical Hacking?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Ethical Hacking over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Ethical Hacking, Today, Hyper-connected, and Landscape, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with Ethical Hacking. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_12_1791176289",
+          "created_at": "2026-10-05T10:28:09.619147"
+        },
+        {
+          "event_name": "Generative AI",
+          "event_description": " Covers how artificial intelligence creates new content like text, code, images, audio, and video using deep learning models trained on massive datasets",
+          "interests": "LLMs and RAG",
+          "goal": "Find a mentor",
+          "topics": [
+            "Llms And Rag",
+            "Covers",
+            "Artificial",
+            "Intelligence"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Llms And Rag?",
+                "Hello! Have you been following the recent developments in Llms And Rag, Covers, Artificial, and Intelligence?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Llms And Rag?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Find a mentor'.",
+              "options": [
+                "I'm really interested in building expertise in LLMs and RAG. How did you navigate your career path in this domain?",
+                "As someone working around Llms And Rag, Covers, Artificial, and Intelligence, what advice would you give to someone looking to grow in this area?",
+                "What were some pivotal experiences or projects that helped you master LLMs and RAG?"
+              ],
+              "question": "I'm really interested in building expertise in LLMs and RAG. How did you navigate your career path in this domain?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Llms And Rag, Covers, Artificial, and Intelligence.",
+              "options": [
+                "Looking back at recent advancements in Llms And Rag, Covers, Artificial, and Intelligence, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on LLMs and RAG?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Llms And Rag over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Llms And Rag, Covers, Artificial, and Intelligence, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with LLMs and RAG. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_11_1791176006",
+          "created_at": "2026-10-05T10:23:26.044747"
+        },
+        {
+          "event_name": "Generative AI",
+          "event_description": "Generative AI (GenAI) is a branch of artificial intelligence focused on creating completely new content rather than just analyzing existing data. It uses advanced machine learning models trained on massive datasets to generate human-like outputs in seconds.",
+          "interests": "RAG",
+          "goal": "Find a mentor",
+          "topics": [
+            "Rag",
+            "Generative",
+            "Genai",
+            "Branch"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Rag?",
+                "Hello! Have you been following the recent developments in Rag, Generative, Genai, and Branch?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Rag?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Find a mentor'.",
+              "options": [
+                "I'm really interested in building expertise in RAG. How did you navigate your career path in this domain?",
+                "As someone working around Rag, Generative, Genai, and Branch, what advice would you give to someone looking to grow in this area?",
+                "What were some pivotal experiences or projects that helped you master RAG?"
+              ],
+              "question": "I'm really interested in building expertise in RAG. How did you navigate your career path in this domain?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Rag, Generative, Genai, and Branch.",
+              "options": [
+                "Looking back at recent advancements in Rag, Generative, Genai, and Branch, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on RAG?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Rag over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Rag, Generative, Genai, and Branch, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with RAG. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_10_1791173529",
+          "created_at": "2026-10-05T09:42:09.646189"
+        },
+        {
+          "event_name": "Generative AI",
+          "event_description": "Generative AI (GenAI) is a branch of artificial intelligence focused on creating completely new content rather than just analyzing existing data. It uses advanced machine learning models trained on massive datasets to generate human-like outputs in seconds.",
+          "interests": "LLM's",
+          "goal": "Find a mentor",
+          "topics": [
+            "Llm'S",
+            "Generative",
+            "Genai",
+            "Branch"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Llm'S?",
+                "Hello! Have you been following the recent developments in Llm'S, Generative, Genai, and Branch?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Llm'S?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Find a mentor'.",
+              "options": [
+                "I'm really interested in building expertise in LLM's. How did you navigate your career path in this domain?",
+                "As someone working around Llm'S, Generative, Genai, and Branch, what advice would you give to someone looking to grow in this area?",
+                "What were some pivotal experiences or projects that helped you master LLM's?"
+              ],
+              "question": "I'm really interested in building expertise in LLM's. How did you navigate your career path in this domain?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Llm'S, Generative, Genai, and Branch.",
+              "options": [
+                "Looking back at recent advancements in Llm'S, Generative, Genai, and Branch, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on LLM's?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Llm'S over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Llm'S, Generative, Genai, and Branch, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with LLM's. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_9_1791173501",
+          "created_at": "2026-10-05T09:41:41.887200"
+        },
+        {
+          "event_name": "Generative AI",
+          "event_description": "Generative AI (GenAI) is a branch of artificial intelligence focused on creating completely new content rather than just analyzing existing data. It uses advanced machine learning models trained on massive datasets to generate human-like outputs in seconds.",
+          "interests": "Generative AI and LLM's",
+          "goal": "Learn about a technology",
+          "topics": [
+            "Generative Ai And Llm'S",
+            "Generative",
+            "Genai",
+            "Branch"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Generative Ai And Llm'S?",
+                "Hello! Have you been following the recent developments in Generative Ai And Llm'S, Generative, Genai, and Branch?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Generative Ai And Llm'S?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Learn about a technology'.",
+              "options": [
+                "What specific aspect of Generative Ai And Llm'S aligns most with your current projects?",
+                "How is your organization approaching current industry trends in Generative Ai And Llm'S, Generative, Genai, and Branch?",
+                "What has been your main focus or initiative recently regarding Generative AI and LLM's?"
+              ],
+              "question": "What specific aspect of Generative Ai And Llm'S aligns most with your current projects?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Generative Ai And Llm'S, Generative, Genai, and Branch.",
+              "options": [
+                "Looking back at recent advancements in Generative Ai And Llm'S, Generative, Genai, and Branch, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on Generative AI and LLM's?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Generative Ai And Llm'S over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Generative Ai And Llm'S, Generative, Genai, and Branch, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with Generative AI and LLM's. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_8_1791173132",
+          "created_at": "2026-10-05T09:35:32.464441"
+        },
+        {
+          "event_name": "Global Cybersecurity & Cloud Security Conference",
+          "event_description": "Join industry leaders at the Global Cybersecurity Expo to discuss emerging threats in cloud infrastructure, zero trust architecture, and ethical hacking protocols. Sessions will focus on threat intelligence automation, ransomware defense strategies, compliance frameworks, and safeguarding enterprise data against AI-powered cyber attacks.\n",
+          "interests": "ethical hacking, cloud security, zero trust",
+          "goal": "Learn about a technology",
+          "topics": [
+            "Ethical Hacking",
+            "Cloud Security",
+            "Zero Trust",
+            "Join"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Ethical Hacking?",
+                "Hello! Have you been following the recent developments in Ethical Hacking, Cloud Security, Zero Trust, and Join?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Ethical Hacking?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Learn about a technology'.",
+              "options": [
+                "What specific aspect of Ethical Hacking aligns most with your current projects?",
+                "How is your organization approaching current industry trends in Ethical Hacking, Cloud Security, Zero Trust, and Join?",
+                "What has been your main focus or initiative recently regarding ethical hacking?"
+              ],
+              "question": "What specific aspect of Ethical Hacking aligns most with your current projects?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Ethical Hacking, Cloud Security, Zero Trust, and Join.",
+              "options": [
+                "Looking back at recent advancements in Ethical Hacking, Cloud Security, Zero Trust, and Join, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on ethical hacking?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Ethical Hacking over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Ethical Hacking, Cloud Security, Zero Trust, and Join, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with ethical hacking. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_7_1791172805",
+          "created_at": "2026-10-05T09:30:05.349144"
+        },
+        {
+          "event_name": "Global Cybersecurity & Cloud Security Conference",
+          "event_description": "Join industry leaders at the Global Cybersecurity Expo to discuss emerging threats in cloud infrastructure, zero trust architecture, and ethical hacking protocols. Sessions will focus on threat intelligence automation, ransomware defense strategies, compliance frameworks, and safeguarding enterprise data against AI-powered cyber attacks.\n",
+          "interests": "ethical hacking, cloud security, zero trust",
+          "goal": "Learn about a technology",
+          "topics": [
+            "Ethical Hacking",
+            "Cloud Security",
+            "Zero Trust",
+            "Join"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Ethical Hacking?",
+                "Hello! Have you been following the recent developments in Ethical Hacking, Cloud Security, Zero Trust, and Join?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Ethical Hacking?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Learn about a technology'.",
+              "options": [
+                "What specific aspect of Ethical Hacking aligns most with your current projects?",
+                "How is your organization approaching current industry trends in Ethical Hacking, Cloud Security, Zero Trust, and Join?",
+                "What has been your main focus or initiative recently regarding ethical hacking?"
+              ],
+              "question": "What specific aspect of Ethical Hacking aligns most with your current projects?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Ethical Hacking, Cloud Security, Zero Trust, and Join.",
+              "options": [
+                "Looking back at recent advancements in Ethical Hacking, Cloud Security, Zero Trust, and Join, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on ethical hacking?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Ethical Hacking over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Ethical Hacking, Cloud Security, Zero Trust, and Join, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with ethical hacking. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_6_1791172040",
+          "created_at": "2026-10-05T09:17:20.216500"
+        },
+        {
           "event_name": "Networking Event",
           "event_description": "Artificial Intelligence",
           "interests": "Hacking",
@@ -337,6 +825,67 @@
       "conversation_style": "Balanced (Technical + Professional)",
       "sessions": [
         {
+          "event_name": "Cybersecurity",
+          "event_description": "Cybersecurity is the practice of protecting systems, networks, programs, and data from digital attacks to ensure confidentiality, integrity, and availability of information.",
+          "interests": "Ethical Hacking",
+          "goal": "Learn about a technology",
+          "topics": [
+            "Ethical Hacking",
+            "Cybersecurity",
+            "Practice",
+            "Protecting"
+          ],
+          "starters": [
+            {
+              "step": 1,
+              "stage": "Step 1 \u2022 Opening Icebreaker",
+              "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
+              "options": [
+                "Hi! What brings you to this session on Ethical Hacking?",
+                "Hello! Have you been following the recent developments in Ethical Hacking, Cybersecurity, Practice, and Protecting?",
+                "Hi there! What has been the most interesting talk or topic for you at this event so far?"
+              ],
+              "question": "Hi! What brings you to this session on Ethical Hacking?"
+            },
+            {
+              "step": 2,
+              "stage": "Step 2 \u2022 Follow-Up Question",
+              "explanation": "Explores current work while aligning with your goal: 'Learn about a technology'.",
+              "options": [
+                "What specific aspect of Ethical Hacking aligns most with your current projects?",
+                "How is your organization approaching current industry trends in Ethical Hacking, Cybersecurity, Practice, and Protecting?",
+                "What has been your main focus or initiative recently regarding Ethical Hacking?"
+              ],
+              "question": "What specific aspect of Ethical Hacking aligns most with your current projects?"
+            },
+            {
+              "step": 3,
+              "stage": "Step 3 \u2022 Deeper Technical / Industry Focus",
+              "explanation": "Drives a meaningful conversation around Ethical Hacking, Cybersecurity, Practice, and Protecting.",
+              "options": [
+                "Looking back at recent advancements in Ethical Hacking, Cybersecurity, Practice, and Protecting, what's one key decision or architecture lesson that shaped your current approach?",
+                "How do you address open challenges like data quality, security, or ethics when working on Ethical Hacking?",
+                "Where do you see the biggest technical bottlenecks or breakthroughs happening in Ethical Hacking over the next couple of years?"
+              ],
+              "question": "Looking back at recent advancements in Ethical Hacking, Cybersecurity, Practice, and Protecting, what's one key decision or architecture lesson that shaped your current approach?"
+            },
+            {
+              "step": 4,
+              "stage": "Step 4 \u2022 Connection & Closing Question",
+              "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
+              "options": [
+                "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
+                "This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
+                "I'd love to stay updated on your work with Ethical Hacking. May I follow up with you on LinkedIn?"
+              ],
+              "question": "I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?"
+            }
+          ],
+          "notes": "",
+          "id": "session_2_1791095901",
+          "created_at": "2026-10-04T12:08:21.916215"
+        },
+        {
           "event_name": "Networking Event",
           "event_description": "A cybersecurity event is any observable occurrence or activity that may impact the security of an organization\u2019s information systems, networks, or data",
           "interests": "Ethical Hacking",
@@ -398,8 +947,108 @@
           "created_at": "2026-10-01T06:03:57.909270"
         }
       ],
-      "people": [],
-      "feedback": [],
+      "people": [
+        {
+          "name": "Rahul Sharma",
+          "title": "Ethical Hacker",
+          "interests": [
+            "Cybersecurity"
+          ],
+          "common_interests": [
+            "Cybersecurity"
+          ],
+          "match_percentage": 50,
+          "reason_to_connect": "Complementary background between Ethical Hacker and your focus on tech.",
+          "suggested_opener": "Hi Rahul, I noticed your work in Ethical Hacker. I've been exploring this area as well\u2014what project are you currently most focused on?",
+          "notes": "",
+          "id": "person_5_1791092677",
+          "created_at": "2026-10-04T11:14:37.999609"
+        },
+        {
+          "name": "Sheer",
+          "title": "Agentic AI",
+          "interests": [
+            "Gen AI"
+          ],
+          "common_interests": [
+            "Gen AI"
+          ],
+          "match_percentage": 50,
+          "reason_to_connect": "Complementary background between Agentic AI and your focus on tech.",
+          "suggested_opener": "Hi Sheer, I noticed your work in Agentic AI. I've been exploring this area as well\u2014what project are you currently most focused on?",
+          "notes": "",
+          "id": "person_4_1790822787",
+          "created_at": "2026-10-01T08:16:27.735964"
+        },
+        {
+          "name": "Challa Madhav",
+          "title": "Agentic AI",
+          "interests": [
+            "Gen AI"
+          ],
+          "common_interests": [
+            "Gen AI"
+          ],
+          "match_percentage": 50,
+          "reason_to_connect": "Complementary background between Agentic AI and your focus on tech.",
+          "suggested_opener": "Hi Challa, I noticed your work in Agentic AI. I've been exploring this area as well\u2014what project are you currently most focused on?",
+          "notes": "",
+          "id": "person_3_1790822774",
+          "created_at": "2026-10-01T08:16:14.458297"
+        },
+        {
+          "name": "Challa Sai",
+          "title": "Agentic AI",
+          "interests": [
+            "Gen AI"
+          ],
+          "common_interests": [
+            "Gen AI"
+          ],
+          "match_percentage": 50,
+          "reason_to_connect": "Complementary background between Agentic AI and your focus on tech.",
+          "suggested_opener": "Hi Challa, I noticed your work in Agentic AI. I've been exploring this area as well\u2014what project are you currently most focused on?",
+          "notes": "",
+          "id": "person_2_1790822764",
+          "created_at": "2026-10-01T08:16:04.192666"
+        },
+        {
+          "name": "Challa Sai",
+          "title": "Agentic AI",
+          "interests": [
+            "Gen AI"
+          ],
+          "common_interests": [
+            "Gen AI"
+          ],
+          "match_percentage": 50,
+          "reason_to_connect": "Complementary background between Agentic AI and your focus on tech.",
+          "suggested_opener": "Hi Challa, I noticed your work in Agentic AI. I've been exploring this area as well\u2014what project are you currently most focused on?",
+          "notes": "",
+          "id": "person_1_1790822739",
+          "created_at": "2026-10-01T08:15:39.667261"
+        }
+      ],
+      "feedback": [
+        {
+          "timestamp": "2026-10-04T12:12:53.521847",
+          "starter_text": "What specific aspect of Ethical Hacking aligns most with your current projects?",
+          "feedback": "like",
+          "category": "Learn about a technology"
+        },
+        {
+          "timestamp": "2026-10-04T12:12:50.227225",
+          "starter_text": "Hi! What brings you to this session on Ethical Hacking?",
+          "feedback": "like",
+          "category": "Learn about a technology"
+        },
+        {
+          "timestamp": "2026-10-04T12:12:48.601724",
+          "starter_text": "Hi! What brings you to this session on Ethical Hacking?",
+          "feedback": "like",
+          "category": "Learn about a technology"
+        }
+      ],
       "preferences": {
         "technical_weight": 0.5,
         "career_weight": 0.5,

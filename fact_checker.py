@@ -1,10 +1,37 @@
-import wikipediaapi
 import requests
+
+HEADERS = {'User-Agent': 'PersonalizedNetworkingAssistant/2.0 (networking.assistant@example.com)'}
+
+def fetch_wiki_summary(title_str: str):
+    try:
+        url = 'https://en.wikipedia.org/w/api.php'
+        params = {
+            'action': 'query',
+            'format': 'json',
+            'prop': 'extracts',
+            'exintro': 1,
+            'explaintext': 1,
+            'redirects': 1,
+            'titles': title_str
+        }
+        res = requests.get(url, headers=HEADERS, params=params, timeout=5)
+        if res.status_code == 200:
+            pages = res.json().get('query', {}).get('pages', {})
+            for pid, p in pages.items():
+                if pid == "-1":
+                    continue
+                title = p.get('title', title_str)
+                extract = p.get('extract', '').strip()
+                if extract and len(extract) > 40 and "may refer to:" not in extract.lower() and "refer to:" not in extract.lower():
+                    return title, extract
+    except Exception:
+        pass
+    return None, None
 
 def verify_fact(query: str) -> str:
     """
     Verifies a fact or looks up a term using Wikipedia API.
-    Resolves compound topics (e.g. 'Blockchain in Healthcare') using Wikipedia search.
+    Resolves compound topics and disambiguation pages (e.g. 'Hacking', 'Blockchain in Healthcare').
     Returns a summarized reference.
     """
     if not query or not query.strip():
@@ -12,45 +39,38 @@ def verify_fact(query: str) -> str:
         
     query_clean = query.strip()
     
+    # 1. Try direct title fetch with redirect handling
+    t, s = fetch_wiki_summary(query_clean)
+    if s:
+        return f"(Reference for '{t}'): " + (s[:600] + "..." if len(s) > 600 else s)
+
+    # 2. Use Wikipedia Full-Text Search API (action=query&list=search)
     try:
-        wiki = wikipediaapi.Wikipedia(
-            user_agent='PersonalizedNetworkingAssistant/2.0 (networking.assistant@example.com)',
-            language='en'
-        )
-        
-        # 1. Try direct exact match
-        page = wiki.page(query_clean)
-        if page.exists() and len(page.summary.strip()) > 50:
-            summary = page.summary
-            return summary[:600] + "..." if len(summary) > 600 else summary
-
-        # 2. Use Wikipedia OpenSearch API to resolve compound/phrase queries
-        search_url = "https://en.wikipedia.org/w/api.php"
+        url = 'https://en.wikipedia.org/w/api.php'
         params = {
-            "action": "opensearch",
-            "search": query_clean,
-            "limit": 3,
-            "namespace": 0,
-            "format": "json"
+            'action': 'query',
+            'list': 'search',
+            'srsearch': query_clean,
+            'srlimit': 6,
+            'format': 'json'
         }
-        res = requests.get(search_url, params=params, timeout=5)
+        res = requests.get(url, headers=HEADERS, params=params, timeout=5)
         if res.status_code == 200:
-            data = res.json()
-            if len(data) >= 2 and len(data[1]) > 0:
-                top_title = data[1][0]
-                search_page = wiki.page(top_title)
-                if search_page.exists() and len(search_page.summary.strip()) > 50:
-                    summary = search_page.summary
-                    return f"(Reference for '{top_title}'): " + (summary[:600] + "..." if len(summary) > 600 else summary)
+            search_items = res.json().get('query', {}).get('search', [])
+            for item in search_items:
+                candidate_title = item.get('title')
+                if candidate_title:
+                    t, s = fetch_wiki_summary(candidate_title)
+                    if s:
+                        return f"(Reference for '{t}'): " + (s[:600] + "..." if len(s) > 600 else s)
+    except Exception:
+        pass
 
-        # 3. Fallback: Try first main keyword before preposition (e.g. 'Blockchain in Healthcare' -> 'Blockchain')
-        if " in " in query_clean.lower() or " for " in query_clean.lower():
-            main_term = query_clean.split()[0]
-            term_page = wiki.page(main_term)
-            if term_page.exists() and len(term_page.summary.strip()) > 50:
-                summary = term_page.summary
-                return f"(Reference for '{main_term}'): " + (summary[:600] + "..." if len(summary) > 600 else summary)
+    # 3. Fallback: try primary keywords
+    words = [w for w in query_clean.split() if len(w) > 2 and w.lower() not in ["in", "for", "the", "and", "with"]]
+    for w in words:
+        t, s = fetch_wiki_summary(w)
+        if s:
+            return f"(Reference for '{t}'): " + (s[:600] + "..." if len(s) > 600 else s)
 
-        return f"No matching Wikipedia entry found for '{query_clean}'."
-    except Exception as e:
-        return f"Error retrieving facts from Wikipedia: {str(e)}"
+    return f"No matching Wikipedia entry found for '{query_clean}'."

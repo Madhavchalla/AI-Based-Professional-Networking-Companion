@@ -238,7 +238,7 @@ def get_analytics(token: str = None):
     
     total_events = len(sessions)
     total_people = len(people)
-    total_conversations = sum(len(s.get("multi_step_flow", [])) for s in sessions)
+    total_conversations = sum(len(s.get("starters", s.get("multi_step_flow", []))) for s in sessions)
     
     upvotes = len([f for f in feedbacks if f.get("feedback") == "like"])
     downvotes = len([f for f in feedbacks if f.get("feedback") == "dislike"])

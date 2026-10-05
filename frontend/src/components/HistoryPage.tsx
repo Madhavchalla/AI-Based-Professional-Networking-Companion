@@ -73,13 +73,17 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ profile, onOpenAuth, r
                   ))}
                 </div>
 
-                {s.multi_step_flow && s.multi_step_flow.length > 0 && (
+                {((s.starters && s.starters.length > 0) || (s.multi_step_flow && s.multi_step_flow.length > 0)) && (
                   <div style={{ background: '#ffffff', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0', marginTop: '10px' }}>
                     <div style={{ fontSize: '11px', color: '#2563eb', fontWeight: 700, marginBottom: '4px' }}>
                       Key Icebreaker Starter:
                     </div>
                     <div style={{ color: 'var(--text-main)', fontSize: '13px' }}>
-                      "{typeof s.multi_step_flow[0] === 'string' ? s.multi_step_flow[0] : (s.multi_step_flow[0]?.question || (s.multi_step_flow[0] as any)?.options?.[0])}"
+                      "{(() => {
+                        const flow = s.starters || s.multi_step_flow || [];
+                        const first = flow[0];
+                        return typeof first === 'string' ? first : (first?.question || first?.options?.[0]);
+                      })()}"
                     </div>
                   </div>
                 )}

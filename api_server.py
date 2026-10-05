@@ -4,6 +4,12 @@ from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 # Import existing modular AI services
 from event_analyzer import extract_themes
 from topic_generator import generate_conversation_starters
@@ -387,4 +393,8 @@ def log_feedback(req: FeedbackRequest, authorization: Optional[str] = Header(Non
 @app.get("/api/analytics")
 def get_analytics(authorization: Optional[str] = Header(None)):
     return database.get_analytics(authorization)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("api_server:app", host="127.0.0.1", port=8000, reload=True)
 

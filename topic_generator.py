@@ -2,10 +2,16 @@ import os
 import requests
 import json
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 def generate_conversation_starters(event_description: str, interests: str, themes: list) -> list:
     """
-    Generates 2-3 conversation starters.
-    Mimics GPT-2 text generation pipeline.
+    Generates 2-3 conversation starters using Google Gemini API if key is present,
+    or falls back to local intelligent generation.
     """
     interests_list = [i.strip() for i in interests.split(",") if i.strip()]
     primary_interest = interests_list[0] if len(interests_list) > 0 else "technology"
@@ -14,38 +20,40 @@ def generate_conversation_starters(event_description: str, interests: str, theme
     themes_str = ", ".join(themes)
     interests_str = ", ".join(interests_list)
     
-    # Try using Gemini API if key is available
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key and api_key != "MY_GEMINI_API_KEY" and api_key.strip():
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    # Try using Google Gemini API if key is available
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    if api_key and api_key.strip() and "YOUR_GEMINI" not in api_key.upper():
         prompt = (
-            f"You are GPT-2, a text-generation language model.\n"
-            f"Generate exactly two conversation starters for a user attending a networking event.\n\n"
+            f"Generate exactly two engaging conversation starters for a user attending a professional networking event.\n\n"
             f"Event Themes: {themes_str}\n"
             f"User Interests: {interests_str}\n\n"
-            f"Make Starter 1 exactly the prompt template style: "
-            f"'I'm attending a networking event focused on {themes_str}. I'm personally interested in {interests_str}. What are three creative and engaging conversation starters I could use to break the ice?'\n\n"
-            f"Make Starter 2 a more speculative, human-like completion in GPT-2 style (which can end slightly incomplete, e.g., 'I have always been interested in learning more about the field of {primary_interest} and how it impacts {secondary_interest}. Recently, I was reading about...'):\n\n"
-            f"Output exactly a JSON list of 2 strings. Example format: [\"Starter 1\", \"Starter 2\"]. No other text or markdown."
+            f"Starter 1: An icebreaker question focusing on {themes_str} and {primary_interest}.\n"
+            f"Starter 2: A thought-provoking follow-up topic about future developments in {primary_interest}.\n\n"
+            f"Output exactly a JSON list of 2 strings. Example format: [\"Starter 1\", \"Starter 2\"]. Output no other text or markdown."
         )
-        try:
-            payload = {
-                "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {
-                    "responseMimeType": "application/json"
+        
+        models = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-pro-latest", "gemini-3.5-flash", "gemini-1.5-flash"]
+        for model in models:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key.strip()}"
+            try:
+                payload = {
+                    "contents": [{"parts": [{"text": prompt}]}]
                 }
-            }
-            res = requests.post(url, json=payload, timeout=8)
-            if res.status_code == 200:
-                data = res.json()
-                text = data["contents"][0]["parts"][0]["text"].strip()
-                parsed = json.loads(text)
-                if isinstance(parsed, list) and len(parsed) >= 2:
-                    return [str(x).strip() for x in parsed[:2]]
-        except Exception as e:
-            pass
+                res = requests.post(url, json=payload, timeout=8)
+                if res.status_code == 200:
+                    data = res.json()
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
+                        if text.startswith("```"):
+                            text = text.replace("```json", "").replace("```", "").strip()
+                        parsed = json.loads(text)
+                        if isinstance(parsed, list) and len(parsed) >= 2:
+                            return [str(x).strip() for x in parsed[:2]]
+            except Exception:
+                continue
 
-    # Local fallback generator if Gemini is not working or API key is not present
+    # Local fallback generator if Gemini is not configured or fails
     starter1 = (
         f"I'm attending a networking event focused on {themes_str}. "
         f"I'm personally interested in {interests_str}. "
