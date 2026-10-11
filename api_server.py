@@ -12,7 +12,7 @@ except ImportError:
 
 # Import existing modular AI services
 from event_analyzer import extract_themes
-from topic_generator import generate_conversation_starters
+from topic_generator import generate_conversation_starters, generate_multi_stage_sequence
 from fact_checker import verify_fact
 
 # Import database services
@@ -179,86 +179,15 @@ def generate_conversation_flow(req: MultiStepConversationRequest):
     themes = req.themes or extract_themes(event_desc, user_interests)
     if not themes:
         themes = [i.strip() for i in user_interests.split(",") if i.strip()]
-        
-    themes_str = format_list_human(themes)
-    primary_interest = user_interests.split(',')[0].strip() if user_interests else themes[0]
-    first_theme = themes[0] if themes else "this topic"
-    
-    openers = [
-        f"Hi! What brings you to this session on {first_theme}?",
-        f"Hello! Have you been following the recent developments in {themes_str}?",
-        f"Hi there! What has been the most interesting talk or topic for you at this event so far?"
-    ]
-    
-    if "mentor" in goal.lower():
-        follow_ups = [
-            f"I'm really interested in building expertise in {primary_interest}. How did you navigate your career path in this domain?",
-            f"As someone working around {themes_str}, what advice would you give to someone looking to grow in this area?",
-            f"What were some pivotal experiences or projects that helped you master {primary_interest}?"
-        ]
-    elif "internship" in goal.lower() or "career" in goal.lower():
-        follow_ups = [
-            f"My background is in {primary_interest}, and I'm actively exploring new opportunities. How are teams in your organization tackling {first_theme} right now?",
-            f"What key technical skills or project experience do you value most when hiring for {primary_interest} roles?",
-            f"How is your team expanding its efforts in {themes_str}, and what kind of projects are you focusing on?"
-        ]
-    elif "research" in goal.lower():
-        follow_ups = [
-            f"I notice your work touches on {themes_str}. What current research questions or methodologies are you most excited about right now?",
-            f"What open research challenges in {primary_interest} do you feel are currently under-explored?",
-            f"How are you approaching experimental validation or data collection in your {first_theme} projects?"
-        ]
-    else:
-        follow_ups = [
-            f"What specific aspect of {first_theme} aligns most with your current projects?",
-            f"How is your organization approaching current industry trends in {themes_str}?",
-            f"What has been your main focus or initiative recently regarding {primary_interest}?"
-        ]
-
-    deeper_questions = [
-        f"Looking back at recent advancements in {themes_str}, what's one key decision or architecture lesson that shaped your current approach?",
-        f"How do you address open challenges like data quality, security, or ethics when working on {primary_interest}?",
-        f"Where do you see the biggest technical bottlenecks or breakthroughs happening in {first_theme} over the next couple of years?"
-    ]
-
-    closings = [
-        f"I've learned so much from your perspective! Would you be open to connecting on LinkedIn or exchanging contact info?",
-        f"This was a super insightful conversation! Would you be open to catching up for a brief 15-minute virtual coffee sometime?",
-        f"I'd love to stay updated on your work with {primary_interest}. May I follow up with you on LinkedIn?"
-    ]
 
     gpt2_starters = generate_conversation_starters(event_desc, user_interests, themes)
-
-    multi_step_flow = [
-        {
-            "step": 1,
-            "stage": "Step 1 • Opening Icebreaker",
-            "explanation": "Gentle, low-pressure icebreakers to initiate conversation naturally.",
-            "options": openers,
-            "question": openers[0]
-        },
-        {
-            "step": 2,
-            "stage": "Step 2 • Follow-Up Question",
-            "explanation": f"Explores current work while aligning with your goal: '{goal}'.",
-            "options": follow_ups,
-            "question": follow_ups[0]
-        },
-        {
-            "step": 3,
-            "stage": "Step 3 • Deeper Technical / Industry Focus",
-            "explanation": f"Drives a meaningful conversation around {themes_str}.",
-            "options": deeper_questions,
-            "question": deeper_questions[0]
-        },
-        {
-            "step": 4,
-            "stage": "Step 4 • Connection & Closing Question",
-            "explanation": "Seamless transition to secure contact info and build a lasting professional link.",
-            "options": closings,
-            "question": closings[0]
-        }
-    ]
+    multi_step_flow = generate_multi_stage_sequence(
+        event_title="",
+        event_description=event_desc,
+        interests=user_interests,
+        networking_goal=goal,
+        themes=themes
+    )
 
     return {
         "event_description": event_desc,

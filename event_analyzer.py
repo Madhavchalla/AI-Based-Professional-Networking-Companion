@@ -15,32 +15,52 @@ def extract_themes(event_description: str, interests: str) -> list:
     if not event_desc and not user_int:
         return []
     
+    # Noise words to filter out from themes
+    noise_words = {
+        "today", "landscape", "occurrence", "recent", "advancement", "advancements", 
+        "overview", "keynote", "session", "speaker", "speakers", "host", "welcome", 
+        "intro", "introduction", "event", "conference", "meetup", "summit", "panel", 
+        "discussion", "attendee", "attendees", "looking", "about", "their", "where",
+        "which", "there", "here", "other", "some", "many", "more", "most", "first"
+    }
+
     # Try using Gemini API if key is available
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key and api_key != "MY_GEMINI_API_KEY" and api_key.strip():
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    if api_key and api_key.strip() and "YOUR_GEMINI" not in api_key.upper():
         prompt = (
-            f"Extract 2 to 4 concise, key topic terms strictly present in or directly relevant to the following event and user interests.\n\n"
+            f"Extract 2 to 4 concise, high-level subject matter domain terms strictly present in or directly relevant to the following event and user interests.\n\n"
             f"Event Description: {event_desc}\n"
             f"User Interests: {user_int}\n\n"
+            f"Do NOT include generic meta words like 'today', 'landscape', 'conference', 'session', or 'speaker'.\n"
             f"Output ONLY a valid JSON list of strings. Example: [\"Quantum Computing\", \"Machine Learning\"]. No other text or markdown."
         )
-        try:
-            payload = {
-                "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {
-                    "responseMimeType": "application/json"
+        
+        models = ["gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-flash-latest", "gemini-pro-latest"]
+        for model in models:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key.strip()}"
+            try:
+                payload = {
+                    "contents": [{"parts": [{"text": prompt}]}]
                 }
-            }
-            res = requests.post(url, json=payload, timeout=8)
-            if res.status_code == 200:
-                data = res.json()
-                text = data["contents"][0]["parts"][0]["text"].strip()
-                parsed = json.loads(text)
-                if isinstance(parsed, list) and len(parsed) > 0:
-                    return [str(x).strip() for x in parsed[:4]]
-        except Exception:
-            pass
+                res = requests.post(url, json=payload, timeout=8)
+                if res.status_code == 200:
+                    data = res.json()
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
+                        if text.startswith("```"):
+                            text = text.replace("```json", "").replace("```", "").strip()
+                        parsed = json.loads(text)
+                        if isinstance(parsed, list) and len(parsed) > 0:
+                            cleaned = []
+                            for x in parsed[:4]:
+                                val = str(x).strip()
+                                if val and val.lower() not in noise_words and len(val) > 1:
+                                    cleaned.append(val)
+                            if cleaned:
+                                return cleaned
+            except Exception:
+                continue
 
     # Dynamic NLP Keyword / Keyphrase Extraction from user's actual text
     extracted_topics = []
@@ -49,7 +69,7 @@ def extract_themes(event_description: str, interests: str) -> list:
     if user_int:
         for item in re.split(r'[,;.]', user_int):
             clean_item = item.strip()
-            if len(clean_item) > 1 and clean_item.lower() not in [t.lower() for t in extracted_topics]:
+            if len(clean_item) > 1 and clean_item.lower() not in noise_words and clean_item.lower() not in [t.lower() for t in extracted_topics]:
                 if clean_item.lower() == "ai":
                     extracted_topics.append("AI")
                 elif clean_item.lower() == "ml":
@@ -66,7 +86,7 @@ def extract_themes(event_description: str, interests: str) -> list:
         "your", "their", "our", "its", "event", "session", "conference", "meetup", "summit",
         "any", "some", "other", "also", "main", "many", "all", "observable", "which", "what",
         "how", "why", "who", "where", "when", "there", "here", "just", "more", "most"
-    }
+    }.union(noise_words)
 
     words = re.findall(r'\b[A-Za-z0-9\-]+\b', event_desc)
     
